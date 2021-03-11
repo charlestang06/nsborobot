@@ -1205,5 +1205,5 @@ async def changename(ctx):
     await ctx.send(embed=em)
 
 
-bot.run('Njg5OTAwODE3MjIyMDc0NTM5.XnJmNA.r_sTgT2bMx18eoUp_e3BPTDz0S0')
+bot.run('insert token here')
 
