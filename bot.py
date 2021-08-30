@@ -1,14 +1,18 @@
+import os
 import asyncio
 import json
 import os
 import random
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import datetime
 from discord.utils import get
+from itertools import cycle
+from flask import Flask
+from threading import Thread
+from discord_slash import SlashCommand, SlashCommandOptionType, SlashContext
 
-
-os.chdir("C:\\Users\\charl\\PycharmProjects\\discordbot")
+os.system("pip install -U discord.py[voice]")
 
 intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, presences=True)
 bot_prefix = '.'
@@ -42,12 +46,37 @@ mainshop = [{"name": "basta_bible", "price": 100, "description": "Religion",
              "use": "You create a survival world.....you get blown up by a creeper"}
             ]
 
+app = Flask('')
+
+@app.route('/')
+def main():
+  return "Your Bot Is Ready"
+
+def run():
+  app.run(host="0.0.0.0", port=8000)
+
+def keep_alive():
+  server = Thread(target=run)
+  server.start()
+
+status = cycle(['playing osu!'])
+
+with open('nickname.json', "r") as f:
+  users = json.load(f)
+  sort_users = {k: b for k, b in sorted(users.items(), key=lambda x: x[1].lower())}
+
+with open("nickname.json", "w") as f:
+    json.dump(sort_users, f)
+    print('Namelist Sorted')
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name="osu!"))
-    print("The NSBORO Bot is up and running.")
+  change_status.start()
+  print("The NSBORO Bot is up and running.")
 
+@tasks.loop(seconds=10)
+async def change_status():
+  await bot.change_presence(activity=discord.Game(next(status)))
 
 @bot.event
 async def on_member_join(member):
@@ -66,18 +95,6 @@ PERMANENT INVITE LINK:  https://discord.gg/Ksb296M
 For any inquiries about the server, DM @charlestang06#0754  or @True#7190""")
 
     await ctx.send(f"""Welcome {member.mention} to the NSBORO Discord Server!""")
-
-    with open('leaderboard.json', 'r') as f:
-        users = json.load(f)
-#    if str(member.id) in users:
-#        users["Username"] = str(member)
-#        pass
-#    else:
-#        users[str(member.id)] = {}
-#        users[str(member.id)]["Username"] = str(member)
-#        users[str(member.id)]["Messages Sent"] = 0
-#    with open('leaderboard.json', 'w') as f:
-#        json.dump(users, f)
 
 @bot.event
 async def on_message(message):
@@ -126,18 +143,6 @@ async def on_message(message):
         channel = await user.create_dm()
         await channel.send(f"""Noob go do your work \".studymode off\" to turn this off""")
 
-#    with open('leaderboard.json', 'r') as f:
- #       users = json.load(f)
-  #      if str(message.author.id) in users:
-  #          users[str(user.id)]["Username"] = str(user)
-   #         users[str(user.id)]["Messages Sent"] += 1
-  #      else:
-#            users[str(user.id)] = {}
-#            users[str(user.id)]["Username"] = str(user)
-#            users[str(users.id)]["Messages Sent"] = 0
-#    with open('leaderboard.json', 'w') as f:
-#        json.dump(users, f)
-
     await bot.process_commands(message)
 
 
@@ -151,6 +156,14 @@ async def on_member_leave(member):
 @bot.command()
 async def ping(ctx):
     await ctx.channel.send(f"pong. '{round(bot.latency * 1000)}ms")
+
+@bot.command(pass_context=True)
+async def join(ctx):
+  if (ctx.author.voice):
+    channel = ctx.author.voice.channel
+    await channel.connect()
+  else:
+    await ctx.send("You are not in a voice channel, you must be in a voice channel to run this command")
 
 
 @bot.command()
@@ -260,19 +273,19 @@ async def basta(ctx):
     channel = bot.get_channel(772817612693307424)
     random_number = random.randint(1, 7)
     if random_number == 1:
-        await channel.send(file=discord.File('D:\pics\Basta1.png'))
+        await channel.send(file=discord.File('.//pics//Basta1.png'))
     if random_number == 2:
-        await channel.send(file=discord.File('D:\pics\Basta2.png'))
+        await channel.send(file=discord.File('.//pics//Basta2.png'))
     if random_number == 3:
-        await channel.send(file=discord.File('D:\pics\Basta3.png'))
+        await channel.send(file=discord.File('.//pics//Basta3.png'))
     if random_number == 4:
-        await channel.send(file=discord.File('D:\pics\Basta4.png'))
+        await channel.send(file=discord.File('.//pics//Basta4.png'))
     if random_number == 5:
-        await channel.send(file=discord.File('D:\pics\Basta5.png'))
+        await channel.send(file=discord.File('.//pics//Basta5.png'))
     if random_number == 6:
-        await channel.send(file=discord.File('D:\pics\Basta6.png'))
+        await channel.send(file=discord.File('.//pics//Basta6.png'))
     if random_number == 7:
-        await channel.send(file=discord.File('D:\pics\Basta7.png'))
+        await channel.send(file=discord.File('.//pics//Basta7.png'))
 
 @bot.command()
 async def spam(ctx, user: discord.Member, *, arg):
@@ -295,6 +308,53 @@ async def setname(ctx, *, arg):
             await ctx.send(f"{ctx.author}'s IRL name was set to {name}")
     with open("nickname.json", "w") as f:
         json.dump(users, f)
+
+    #sorting namelist    
+    with open('nickname.json', "r") as f:
+      users = json.load(f)
+      sort_users = {k: b for k, b in sorted(users.items(), key=lambda x: x[1].lower())}
+    with open("nickname.json", "w") as f:
+      json.dump(sort_users, f)
+
+    #sending namelist in member channel
+    channel = bot.get_channel(789896145781391370)
+    await channel.purge(limit=10)
+
+    with open("nickname.json", "r") as f:
+      users = json.load(f)
+    em = discord.Embed(title="Name List",
+                       description="List of IRL Names for students on the NSBORO Server.",
+                       color=discord.Color.orange())
+    em2 = discord.Embed(title="Name List Part 2",
+                       color=discord.Color.orange())
+    em3 = discord.Embed(title="Name List Part 3",
+                        color=discord.Color.orange())
+    em4 = discord.Embed(title="Name List Part 4",
+                        color=discord.Color.orange())
+    em5 = discord.Embed(title="Name List Part 5",
+                        color=discord.Color.orange())
+
+    counter = 1
+    for x in users:
+        user = bot.get_user(int(x))
+        if counter <= 25:
+            em.add_field(name=f"{user}", value = users[str(x)])
+        elif counter > 25 and counter <= 50:
+            em2.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 50 and counter <= 75:
+            em3.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 75 and counter <= 100:
+            em4.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 100 <= 125:
+            em5.add_field(name=f"{user}", value=users[str(x)])
+        counter += 1
+
+    await channel.send(embed = em)
+    await channel.send(embed = em2)
+    await channel.send(embed=em3)
+    await channel.send(embed=em4)
+    await channel.send(embed=em5)
+
 
 @bot.command()
 async def getname(ctx, user : discord.User):
@@ -319,6 +379,53 @@ async def changename(ctx, user : discord.User, *, arg):
             await ctx.send(f"{user}'s IRL name was set to {arg}")
     with open("nickname.json", "w") as f:
         json.dump(users, f)
+    
+    #sort namelist
+    with open('nickname.json', "r") as f:
+      users = json.load(f)
+      sort_users = {k: b for k, b in sorted(users.items(), key=lambda x: x[1].lower())}
+    with open("nickname.json", "w") as f:
+      json.dump(sort_users, f)
+
+    #sending namelist in member channel
+    channel = bot.get_channel(789896145781391370)
+    await channel.purge(limit=10)
+
+    with open("nickname.json", "r") as f:
+      users = json.load(f)
+    em = discord.Embed(title="Name List",
+                       description="List of IRL Names for students on the NSBORO Server.",
+                       color=discord.Color.orange())
+    em2 = discord.Embed(title="Name List Part 2",
+                       color=discord.Color.orange())
+    em3 = discord.Embed(title="Name List Part 3",
+                        color=discord.Color.orange())
+    em4 = discord.Embed(title="Name List Part 4",
+                        color=discord.Color.orange())
+    em5 = discord.Embed(title="Name List Part 5",
+                        color=discord.Color.orange())
+
+    counter = 1
+    for x in users:
+        user = bot.get_user(int(x))
+        if counter <= 25:
+            em.add_field(name=f"{user}", value = users[str(x)])
+        elif counter > 25 and counter <= 50:
+            em2.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 50 and counter <= 75:
+            em3.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 75 and counter <= 100:
+            em4.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 100 <= 125:
+            em5.add_field(name=f"{user}", value=users[str(x)])
+        counter += 1
+
+    await channel.send(embed = em)
+    await channel.send(embed = em2)
+    await channel.send(embed=em3)
+    await channel.send(embed=em4)
+    await channel.send(embed=em5)
+
 
 @bot.command()
 @commands.has_role('Staff')
@@ -334,6 +441,9 @@ async def namelist(ctx):
                         color=discord.Color.orange())
     em4 = discord.Embed(title="Name List Part 4",
                         color=discord.Color.orange())
+    em5 = discord.Embed(title="Name List Part 5",
+                        color=discord.Color.orange())
+
     counter = 1
     for x in users:
         user = bot.get_user(int(x))
@@ -345,12 +455,16 @@ async def namelist(ctx):
             em3.add_field(name=f"{user}", value=users[str(x)])
         elif counter > 75 and counter <= 100:
             em4.add_field(name=f"{user}", value=users[str(x)])
+        elif counter > 100 <= 125:
+            em5.add_field(name=f"{user}", value=users[str(x)])
         counter += 1
 
     await ctx.send(embed = em)
     await ctx.send(embed = em2)
     await ctx.send(embed=em3)
     await ctx.send(embed=em4)
+    await ctx.send(embed=em5)
+
 
 @bot.command()
 async def stats(ctx):
@@ -634,17 +748,17 @@ async def KYT(ctx):
     user = bot.get_user(535314077329784854)
     await ctx.send(f"{user.mention} ping!")
     await user.send("Kevin Yao is the coolest class president ever")
-    await user.send(file=discord.File('D:\pics\KYT1.jpeg'))
-    await user.send(file=discord.File('D:\pics\KYT2.jpg'))
+    await user.send(file=discord.File('.//pics//KYT1.jpeg'))
+    await user.send(file=discord.File('.//pics//KYT2.jpg'))
 
 
 @bot.command()
 async def androne(ctx, *, arg=None):
     if arg == None:
-        await ctx.send(file=discord.File('D:\pics\Androne.png'))
+        await ctx.send(file=discord.File('.//pics//Androne.png'))
     else:
         user = bot.get_user(541427575818551297)
-        await ctx.send(file=discord.File('D:\pics\Androne.png'))
+        await ctx.send(file=discord.File('.//pics//Androne.png'))
         await user.send(f"AndroneZ for Treasurer! Your supporters said {arg}")
         await ctx.send(f"{arg} sent to Androne")
 
@@ -893,19 +1007,19 @@ async def stock(ctx):
 async def panda(ctx):
     random_number = random.randint(1, 7)
     if random_number == 1:
-        await ctx.send(file=discord.File('D:\pics\panda1.png'))
+        await ctx.send(file=discord.File('.//pics//panda1.png'))
     if random_number == 2:
-        await ctx.send(file=discord.File('D:\pics\panda2.png'))
+        await ctx.send(file=discord.File('.//pics//panda2.png'))
     if random_number == 3:
-        await ctx.send(file=discord.File('D:\pics\panda3.png'))
+        await ctx.send(file=discord.File('.//pics//panda3.png'))
     if random_number == 4:
-        await ctx.send(file=discord.File('D:\pics\panda4.png'))
+        await ctx.send(file=discord.File('.//pics//panda4.png'))
     if random_number == 5:
-        await ctx.send(file=discord.File('D:\pics\panda5.png'))
+        await ctx.send(file=discord.File('.//pics//panda5.png'))
     if random_number == 6:
-        await ctx.send(file=discord.File('D:\pics\panda6.png'))
+        await ctx.send(file=discord.File('.//pics//panda6.png'))
     if random_number == 7:
-        await ctx.send(file=discord.File('D:\pics\panda7.png'))
+        await ctx.send(file=discord.File('.//pics//panda7.png'))
 
 @bot.group(invoke_without_command=True)
 async def help(ctx):
@@ -1204,6 +1318,6 @@ async def changename(ctx):
     em.add_field(name="**Syntax**", value=".changename @user [FirstName LastName]")
     await ctx.send(embed=em)
 
-
-bot.run('insert token here')
+my_secret = os.environ['serverkey']
+bot.run(my_secret)
 
