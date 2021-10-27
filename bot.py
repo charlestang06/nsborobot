@@ -10,14 +10,22 @@ from discord.utils import get
 from itertools import cycle
 from flask import Flask
 from threading import Thread
-from discord_slash import SlashCommand, SlashCommandOptionType, SlashContext
-
-os.system("pip install -U discord.py[voice]")
+import PIL
+from PIL import Image, ImageFont, ImageDraw
+import gspread
 
 intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, presences=True)
 bot_prefix = '.'
 bot = commands.Bot(command_prefix=bot_prefix, intents=intents, case_insensitive=True)
 bot.remove_command('help')
+
+gc = gspread.service_account('adept-comfort-330218-f1e157e04890.json')
+sh = gc.open("nsborobotNames")
+worksheet = sh.worksheet("Sheet1")
+
+num_names = 150
+list_names = worksheet.get_all_values()
+list_names = sorted(list_names, key=lambda x:x[1].lower())
 
 mainshop = [{"name": "basta_bible", "price": 100, "description": "Religion",
              "use": "You pray for days and days on end, Basta will always be our God"},
@@ -46,6 +54,7 @@ mainshop = [{"name": "basta_bible", "price": 100, "description": "Religion",
              "use": "You create a survival world.....you get blown up by a creeper"}
             ]
 
+periods = ["period 1", "period 2", "period 3", "period 4", "period 5", "period 6", "period 7"]
 app = Flask('')
 
 @app.route('/')
@@ -59,15 +68,7 @@ def keep_alive():
   server = Thread(target=run)
   server.start()
 
-status = cycle(['playing osu!'])
-
-with open('nickname.json', "r") as f:
-  users = json.load(f)
-  sort_users = {k: b for k, b in sorted(users.items(), key=lambda x: x[1].lower())}
-
-with open("nickname.json", "w") as f:
-    json.dump(sort_users, f)
-    print('Namelist Sorted')
+status = cycle(['osu!', 'Genshin Impact!', 'Should I become therapy bot', 'when will i get an update'])
 
 @bot.event
 async def on_ready():
@@ -296,174 +297,170 @@ async def spam(ctx, user: discord.Member, *, arg):
 
 @bot.command()
 async def setname(ctx, *, arg):
-    user = ctx.author
-    with open("nickname.json", "r") as f:
-        users = json.load(f)
-        name = str(arg)
-        if str(user.id) in users:
-            name = users[str(user.id)]
-            await ctx.send(f"Noob you set your name to {name}. If you would like to change your name, please ping @Staff to change your IRL name.")
-        else:
-            users[str(user.id)] = name
-            await ctx.send(f"{ctx.author}'s IRL name was set to {name}")
-    with open("nickname.json", "w") as f:
-        json.dump(users, f)
+	user = ctx.author
+	if arg == None:
+		ctx.send("You need to input your name!")
+		return
+	name = str(arg)
+	list_names = worksheet.get_all_values()
+	user_id = str(user.id)
+	for i in range(len(list_names)):
+		if list_names[i][0] == user_id:
+			await ctx.send(f"Your name has already been set to {list_names[i][1]}, ask Charles to change it")
+			return
+	list_names.append([user_id, name])
+	list_names = sorted(list_names, key=lambda x:x[1].lower())
+	worksheet.update(f'A1:B{len(list_names)}', list_names)
+	await ctx.send(f"Your name has sucessfully been set to {name}")
 
-    #sorting namelist    
-    with open('nickname.json', "r") as f:
-      users = json.load(f)
-      sort_users = {k: b for k, b in sorted(users.items(), key=lambda x: x[1].lower())}
-    with open("nickname.json", "w") as f:
-      json.dump(sort_users, f)
+	#sending namelist in member channel
+	channel = bot.get_channel(789896145781391370)
+	await channel.purge(limit=10)
 
-    #sending namelist in member channel
-    channel = bot.get_channel(789896145781391370)
-    await channel.purge(limit=10)
-
-    with open("nickname.json", "r") as f:
-      users = json.load(f)
-    em = discord.Embed(title="Name List",
+	em = discord.Embed(title="Name List",
                        description="List of IRL Names for students on the NSBORO Server.",
                        color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2",
+	em2 = discord.Embed(title="Name List Part 2",
                        color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3",
+	em3 = discord.Embed(title="Name List Part 3",
                         color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4",
+	em4 = discord.Embed(title="Name List Part 4",
                         color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5",
+	em5 = discord.Embed(title="Name List Part 5",
                         color=discord.Color.orange())
 
-    counter = 1
-    for x in users:
-        user = bot.get_user(int(x))
-        if counter <= 25:
-            em.add_field(name=f"{user}", value = users[str(x)])
-        elif counter > 25 and counter <= 50:
-            em2.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 50 and counter <= 75:
-            em3.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 75 and counter <= 100:
-            em4.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 100 <= 125:
-            em5.add_field(name=f"{user}", value=users[str(x)])
-        counter += 1
+	counter = 1
 
-    await channel.send(embed = em)
-    await channel.send(embed = em2)
-    await channel.send(embed=em3)
-    await channel.send(embed=em4)
-    await channel.send(embed=em5)
+	for x in list_names:
+		user = bot.get_user(int(x[0]))
+		if user==None: continue
+		if counter <= 25:
+			em.add_field(name=f"{user}", value = x[1])
+		elif counter > 25 and counter <= 50:
+			em2.add_field(name=f"{user}", value=x[1])
+		elif counter > 50 and counter <= 75:
+			em3.add_field(name=f"{user}", value=x[1])
+		elif counter > 75 and counter <= 100:
+			em4.add_field(name=f"{user}", value=x[1])
+		elif counter > 100 <= 125:
+			em5.add_field(name=f"{user}", value=x[1])
+		counter += 1
 
+	await channel.send(embed = em)
+	await channel.send(embed = em2)
+	await channel.send(embed=em3)
+	await channel.send(embed=em4)
+	await channel.send(embed=em5)
+
+	
 
 @bot.command()
 async def getname(ctx, user : discord.User):
-    with open("nickname.json", "r") as f:
-        users = json.load(f)
-        if str(user.id) in users:
-            name = users[str(user.id)]
-            await ctx.send(f"{user}'s IRL name is {name}")
-        else:
-            await ctx.send(f"{user}'s IRL name was not set yet. {user.mention} set your IRL name with \".setname [Name]\"")
+	user_id = str(user.id)
+	list_names = worksheet.get_all_values()
+	for i in range(len(list_names)):
+		if user_id == list_names[i][0]:
+			await ctx.send(f"{user.name} IRL name is {list_names[i][1]}")
+			return
+	await ctx.send(f"{user.name} IRL name has not been set")
+
+
 
 @bot.command()
 @commands.has_role('Staff')
 async def changename(ctx, user : discord.User, *, arg):
-    with open("nickname.json", "r") as f:
-        users = json.load(f)
-        if str(user.id) in users:
-            users[str(user.id)] = arg
-            await ctx.send(f"{user}'s IRL name was updated to {arg}")
-        else:
-            users[str(user.id)] = arg
-            await ctx.send(f"{user}'s IRL name was set to {arg}")
-    with open("nickname.json", "w") as f:
-        json.dump(users, f)
-    
-    #sort namelist
-    with open('nickname.json', "r") as f:
-      users = json.load(f)
-      sort_users = {k: b for k, b in sorted(users.items(), key=lambda x: x[1].lower())}
-    with open("nickname.json", "w") as f:
-      json.dump(sort_users, f)
+	user_id = str(user.id)
+	list_names = worksheet.get_all_values()
+	
+	ifFound = True
+	for i in range(len(list_names)):
+		if user_id == list_names[i][0]:
+			list_names[i][1] = arg
+			worksheet.update(f'A1:B{len(list_names)}', list_names)
+			await ctx.send(f"{user.name} IRL name has been updated to {list_names[i][1]}")
+			ifFound = False
+	if ifFound == True:
+		list_names.append([user_id, arg])
+		list_names = sorted(list_names, key=lambda x:x[1].lower())
+		worksheet.update(f'A1:B{len(list_names)}', list_names)
+		await ctx.send(f"{user.name} IRL name has been set to {arg}")
 
-    #sending namelist in member channel
-    channel = bot.get_channel(789896145781391370)
-    await channel.purge(limit=10)
+	#sending namelist in member channel
+	channel = bot.get_channel(789896145781391370)
+	await channel.purge(limit=10)
 
-    with open("nickname.json", "r") as f:
-      users = json.load(f)
-    em = discord.Embed(title="Name List",
+	em = discord.Embed(title="Name List",
                        description="List of IRL Names for students on the NSBORO Server.",
                        color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2",
+	em2 = discord.Embed(title="Name List Part 2",
                        color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3",
+	em3 = discord.Embed(title="Name List Part 3",
                         color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4",
+	em4 = discord.Embed(title="Name List Part 4",
                         color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5",
+	em5 = discord.Embed(title="Name List Part 5",
                         color=discord.Color.orange())
 
-    counter = 1
-    for x in users:
-        user = bot.get_user(int(x))
-        if counter <= 25:
-            em.add_field(name=f"{user}", value = users[str(x)])
-        elif counter > 25 and counter <= 50:
-            em2.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 50 and counter <= 75:
-            em3.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 75 and counter <= 100:
-            em4.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 100 <= 125:
-            em5.add_field(name=f"{user}", value=users[str(x)])
-        counter += 1
+	counter = 1
+	for x in list_names:
+		user = bot.get_user(int(x[0]))
+		if user==None: continue
+		if counter <= 25:
+			em.add_field(name=f"{user}", value = x[1])
+		elif counter > 25 and counter <= 50:
+			em2.add_field(name=f"{user}", value=x[1])
+		elif counter > 50 and counter <= 75:
+			em3.add_field(name=f"{user}", value=x[1])
+		elif counter > 75 and counter <= 100:
+			em4.add_field(name=f"{user}", value=x[1])
+		elif counter > 100 <= 125:
+			em5.add_field(name=f"{user}", value=x[1])
+		counter += 1
 
-    await channel.send(embed = em)
-    await channel.send(embed = em2)
-    await channel.send(embed=em3)
-    await channel.send(embed=em4)
-    await channel.send(embed=em5)
-
+	await channel.send(embed = em)
+	await channel.send(embed = em2)
+	await channel.send(embed=em3)
+	await channel.send(embed=em4)
+	await channel.send(embed=em5)
 
 @bot.command()
 @commands.has_role('Staff')
 async def namelist(ctx):
-    with open("nickname.json", "r") as f:
-        users = json.load(f)
-    em = discord.Embed(title="Name List",
+	list_names = worksheet.get_all_values()
+	list_names = sorted(list_names, key=lambda x:x[1].lower())
+	em = discord.Embed(title="Name List",
                        description="List of IRL Names for students on the NSBORO Server.",
                        color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2",
+	em2 = discord.Embed(title="Name List Part 2",
                        color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3",
+	em3 = discord.Embed(title="Name List Part 3",
                         color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4",
+	em4 = discord.Embed(title="Name List Part 4",
                         color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5",
+	em5 = discord.Embed(title="Name List Part 5",
                         color=discord.Color.orange())
 
-    counter = 1
-    for x in users:
-        user = bot.get_user(int(x))
-        if counter <= 25:
-            em.add_field(name=f"{user}", value = users[str(x)])
-        elif counter > 25 and counter <= 50:
-            em2.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 50 and counter <= 75:
-            em3.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 75 and counter <= 100:
-            em4.add_field(name=f"{user}", value=users[str(x)])
-        elif counter > 100 <= 125:
-            em5.add_field(name=f"{user}", value=users[str(x)])
-        counter += 1
+	counter = 1
+	for x in list_names:
+		user = bot.get_user(int(x[0]))
+		if user==None: continue
+		if counter <= 25:
+			em.add_field(name=f"{user}", value = x[1])
+		elif counter > 25 and counter <= 50:
+			em2.add_field(name=f"{user}", value=x[1])
+		elif counter > 50 and counter <= 75:
+			em3.add_field(name=f"{user}", value=x[1])
+		elif counter > 75 and counter <= 100:
+			em4.add_field(name=f"{user}", value=x[1])
+		elif counter > 100 <= 125:
+			em5.add_field(name=f"{user}", value=x[1])
+		counter += 1
 
-    await ctx.send(embed = em)
-    await ctx.send(embed = em2)
-    await ctx.send(embed=em3)
-    await ctx.send(embed=em4)
-    await ctx.send(embed=em5)
+	await ctx.send(embed = em)
+	await ctx.send(embed = em2)
+	await ctx.send(embed=em3)
+	await ctx.send(embed=em4)
+	await ctx.send(embed=em5)
 
 
 @bot.command()
@@ -1021,12 +1018,108 @@ async def panda(ctx):
     if random_number == 7:
         await ctx.send(file=discord.File('.//pics//panda7.png'))
 
+@bot.command()
+async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
+  new_schedule = periods[:]
+  
+  #assign
+  new_schedule[0] = arg1
+  new_schedule[1] = arg2
+  new_schedule[2] = arg3
+  new_schedule[3] = arg4
+  new_schedule[4] = arg5
+  new_schedule[5] = arg6
+  new_schedule[6] = arg7
+  #image stuff
+  im1 = Image.open("schedule template.PNG")
+
+  im2 = im1.copy()
+
+  image_editable = ImageDraw.Draw(im2)
+
+  #txtfont = ImageFont.truetype("arial.ttf", 25)
+  txtfont = ImageFont.truetype("DejaVuSansMono-Bold.ttf", 16)
+
+  # period 1
+  image_editable.text((100, 100), new_schedule[0]+"\n8:00-9:00 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((325, 180), new_schedule[0]+"\n8:50-9:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 100), new_schedule[0]+"\n8:00-9:00 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 180), new_schedule[0]+"\n8:50-9:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 83), new_schedule[0]+"\n8:00-8:45 AM", (255, 255, 255), font=txtfont)
+
+  # period 2
+  image_editable.text((100, 215), new_schedule[1]+"\n9:05-10:00 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((325, 85), new_schedule[1]+"\n8:00-8:45 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 215), new_schedule[1]+"\n9:05-10:00 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 85), new_schedule[1]+"\n8:00-8:45 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 175), new_schedule[1]+"\n8:50-9:30 AM", (255, 255, 255), font=txtfont)
+
+  # period 3
+  image_editable.text((100, 325), new_schedule[2]+"\n10:05-10:45 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((325, 775), new_schedule[2]+"\n1:50-2:30 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 688), new_schedule[2]+"\n1:05-1:45 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 510), new_schedule[2]+"\n11:35 AM-1:00 PM\n1: 11:35-12:00 PM \n2: 12:05-12:30 PM \n3: 12:35-1:00 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 400), new_schedule[2]+"\n10:30-11:30 AM", (255, 255, 255), font=txtfont)
+
+  # period 4
+  image_editable.text((100, 420), new_schedule[3]+"\n10:50-11:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((325, 275), new_schedule[3]+"\n9:35-10:25 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 775), new_schedule[3]+"\n1:50-2:30 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 688), new_schedule[3]+"\n1:05-1:45 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 510), new_schedule[3]+"\n11:35 AM-1:00 PM\n1: 11:35-12:00 PM \n2: 12:05-12:30 PM \n3: 12:35-1:00 PM", (255, 255, 255), font=txtfont)
+
+  # period 5 + lunch
+  image_editable.text((100, 510), new_schedule[4]+"\n11:35 AM-1:00 PM\n1: 11:35-12:00 PM \n2: 12:05-12:30 PM \n3: 12:35-1:00 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((325, 390), new_schedule[4]+"\n10:30-11:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 325), new_schedule[4]+"\n10:05-10:45 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 775), new_schedule[4]+"\n1:50-2:30 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 688), new_schedule[4]+"\n1:05-1:45 PM", (255, 255, 255), font=txtfont)
+
+  # period 6
+  image_editable.text((100, 688), new_schedule[5]+"\n1:05-1:45 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((315, 510), new_schedule[5]+"\n11:35 AM-1:00 PM\n1: 11:35-12:00 PM \n2: 12:05-12:30 PM \n3: 12:35-1:00 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 420), new_schedule[5]+"\n10:50-11:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 275), new_schedule[5]+"\n9:35-10:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 775), new_schedule[5]+"\n1:50-2:30 PM", (255, 255, 255), font=txtfont)
+
+  # period 7
+  image_editable.text((100, 775), new_schedule[6]+"\n1:50-2:30 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((325, 688), new_schedule[6]+"\n1:05-1:45 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((540, 510), new_schedule[6]+"\n11:35 AM-1:00 PM\n1: 11:35-12:00 PM \n2: 12:05-12:30 PM \n3: 12:35-1:00 PM", (255, 255, 255), font=txtfont)
+  image_editable.text((750, 390), new_schedule[6]+"\n10:35-11:30 AM", (255, 255, 255), font=txtfont)
+  image_editable.text((970, 275), new_schedule[6]+"\n9:35-10:25 AM", (255, 255, 255), font=txtfont)
+
+  im2 = im2.save("temp.png")
+
+  await ctx.send(file=discord.File(".//temp.png"))
+
+@bot.command()
+async def clubs(ctx):
+	em = discord.Embed(title="ARHS Clubs on NSBORO Bot",
+                       description="Some clubs at gonk that are pretty cool",
+                       color=discord.Color.orange())
+
+	em.add_field(name="Programming Club", value="Thursdays after school @ D111 (Forhan) \n https://discord.gg/HEzFX8VD7F \n https://nsboro.instructure.com/enroll/WP3LEW")
+
+	em.add_field(name="Asia Club", value="Wednesdays after school @ H207 (Frantz) \n https://discord.gg/DRX6jw8g2T")
+
+	em.add_field(name="Varsity Math Team", value="Tuesdays @ 7:10am @ \n Email Mrs.Dore edore@nsboro.k12.ma.us")
+
+	await ctx.send(embed=em)
+
+@bot.command()
+@commands.has_role('Staff')
+async def announce(ctx, *, arg):
+	channel = bot.get_channel(685975002683539569)
+	msg = await channel.send(arg)
+	await msg.publish()
+
 @bot.group(invoke_without_command=True)
 async def help(ctx):
     em = discord.Embed(title=".help on NSBORO Bot",
                        description="Some useful commands for this bot. The bot prefix is \".\". Use .help [command] for more information on each command.",
                        color=discord.Color.orange())
-    em.add_field(name="General", value="color, setname, getname, stats, rules, studymode, invite, report")
+    em.add_field(name="General", value="color, setname, getname, stats, rules, studymode, invite, report, schedule")
     em.add_field(name="Moderation",
                  value="mute, unmute, warn, purge, tempmute, kick, ban, giverole, removerole, addrole, slowmode, changename")
     em.add_field(name="Currency", value="bal, beg, pray, give, rob, lottery, slots, shop, buy, sell, use, stock")
@@ -1317,6 +1410,12 @@ async def changename(ctx):
     em = discord.Embed(title="Changename", description="Changes the mentioned user's IRL name (for Staff only)")
     em.add_field(name="**Syntax**", value=".changename @user [FirstName LastName]")
     await ctx.send(embed=em)
+
+@help.command()
+async def schedule(ctx):
+  em = discord.Embed(title="Schedule", description="Creates a schedule (School Year 2021-2022). Keep each class name to one word without spaces")
+  em.add_field(name="**Syntax**", value=".schedule [first_class] [second_class] [third_class] [fourth_class] [fifth class] [sixth class] [seventh class] **NO SPACES IN CLASS NAMES**")
+  await ctx.send(embed=em)
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
