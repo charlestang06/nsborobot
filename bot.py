@@ -44,11 +44,16 @@ worksheet = sh.worksheet("Sheet1")
 sh2 = gc.open("nsborobotGenshin")
 worksheet2 = sh2.worksheet("Sheet1")
 
+sh3 = gc.open("classes")
+worksheet3 = sh3.worksheet("Sheet1")
+
 num_names = 150
 list_names = worksheet.get_all_values()
 list_names = sorted(list_names, key=lambda x: x[1].lower())
 
 list_UIDs = worksheet2.get_all_values()
+
+list_classes = worksheet3.get_all_values()
 
 mainshop = [{
     "name":
@@ -1369,6 +1374,21 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
     im2 = im2.save(f".//schedules//{ctx.author.id}.png")
     await ctx.send(file=discord.File(f".//schedules//{ctx.author.id}.png"))
 	
+    user_id = str(ctx.author.id)
+    list_classes = worksheet3.get_all_values()
+    ifFound = False
+    for i in range(len(list_classes)):
+        if user_id == list_classes[i][0]:
+            list_classes[i][1:] = [arg1, arg2, arg3, arg4, arg5, arg6, arg7]
+            worksheet3.update(f'A1:H{len(list_classes)}', list_classes)
+            await ctx.send(
+                f"{user.name} schedule has been updated")
+            ifFound = True
+    if ifFound == False:
+        list_classes.append([user_id, arg1, arg2, arg3, arg4, arg5, arg6, arg7])
+        worksheet3.update(f'A1:H{len(list_classes)}', list_classes)
+        await ctx.send(f"{user.name}'s schedule has been set")
+
 
 @bot.command()
 async def viewschedule(ctx):
@@ -1378,6 +1398,7 @@ async def viewschedule(ctx):
     except IOError:
     	await ctx.send("You did not create a schedule yet, use .schedule or .help schedule to learn more about the command")
 	
+
 
 @bot.command()
 async def clubs(ctx):
@@ -1447,6 +1468,104 @@ async def covid(ctx):
 
     await ctx.send(file=discord.File(".//ss.png"))
 
+@bot.group(invoke_without_command = True)
+async def getclass(ctx, user: discord.Member = None):
+    list_classes = worksheet3.get_all_values()
+    if user == None:
+        user = ctx.author
+    userID = user.id
+
+    ifFound = False
+    
+    for i in range(len(list_classes)):
+	    if list_classes[i][0] == str(user.id):
+		    classes = list_classes[i][1:]
+		    ifFound = True
+		    break
+    
+    if ifFound == False:
+	    await ctx.send(f"{user.mention} has not set their schedule yet using .schedule")
+    else:
+        periods = [[1, 2, 3, 4, 5, 6, 7], [2, 1, 4, 5, 6, 7, 3],
+               [1, 2, 5, 6, 7, 3, 4], [2, 1, 6, 7, 2, 3, 4, 5],
+               [1, 2, 7, 3, 4, 5, 6]]
+
+        timeEnd = [[540, 600, 645, 690, 780, 825, 870],
+               [525, 570, 625, 690, 780, 825, 870],
+               [540, 600, 645, 690, 780, 825, 870],
+               [525, 570, 630, 690, 780, 825, 870],
+               [525, 570, 625, 690, 780, 825, 870]]
+
+        now = datetime.now().time()
+        currentDay = datetime.today().weekday()
+        if currentDay in [5, 6]:
+            await ctx.send("Today is a weekend")
+            return
+        hour = int(now.strftime("%H")) - 4
+        if hour < 0:
+            hour = 24 - hour
+        currentMin = hour * 60 + int(now.strftime("%M"))
+        currentPeriod = f"Not in school"
+
+        for i in range(len(timeEnd[currentDay])):
+            if currentMin < timeEnd[currentDay][i] and currentMin > 480:
+                currentPeriod = classes[periods[currentDay][i]-1]
+                break
+		
+        em = discord.Embed(title=f"{user.name} Class", description=currentPeriod, color=discord.Color.orange())
+
+        await ctx.send(embed=em)
+	
+@getclass.command()
+async def next(ctx, user: discord.Member = None):
+    list_classes = worksheet3.get_all_values()
+    if user == None:
+        user = ctx.author
+    userID = user.id
+
+    ifFound = False
+    
+    for i in range(len(list_classes)):
+	    if list_classes[i][0] == str(user.id):
+		    classes = list_classes[i][1:]
+		    ifFound = True
+		    break
+    
+    if ifFound == False:
+	    await ctx.send(f"{user.mention} has not set their schedule yet using .schedule")
+    else:
+        periods = [[1, 2, 3, 4, 5, 6, 7], [2, 1, 4, 5, 6, 7, 3],
+               [1, 2, 5, 6, 7, 3, 4], [2, 1, 6, 7, 2, 3, 4, 5],
+               [1, 2, 7, 3, 4, 5, 6]]
+
+        timeEnd = [[540, 600, 645, 690, 780, 825, 870],
+               [525, 570, 625, 690, 780, 825, 870],
+               [540, 600, 645, 690, 780, 825, 870],
+               [525, 570, 630, 690, 780, 825, 870],
+               [525, 570, 625, 690, 780, 825, 870]]
+
+        now = datetime.now().time()
+        currentDay = datetime.today().weekday()
+        if currentDay in [5, 6]:
+            await ctx.send("Today is a weekend")
+            return
+        hour = int(now.strftime("%H")) - 4
+        if hour < 0:
+            hour = 24 - hour
+        currentMin = hour * 60 + int(now.strftime("%M"))
+        currentPeriod = f"Not in school"
+
+        for i in range(len(timeEnd[currentDay])):
+            if currentMin < timeEnd[currentDay][i] and currentMin > 480:
+                if i == 6:
+                    currentPeriod = "Done with school after this period!"
+                else:
+                    currentPeriod = classes[periods[currentDay][i+1]-1]
+                    break
+		
+        em = discord.Embed(title=f"{user.name} Next Class", description=currentPeriod, color=discord.Color.orange())
+
+        await ctx.send(embed=em)
 
 @bot.group(invoke_without_command=True)
 async def period(ctx):
@@ -1531,7 +1650,7 @@ async def help(ctx):
     em.add_field(
         name="General",
         value=
-        "color, setname, getname, stats, rules, studymode, invite, report, schedule"
+        "color, setname, getname, stats, rules, studymode, invite, report, schedule, viewschedule, getUID, setUID, clubs, covid, period, getclass"
     )
     em.add_field(
         name="Moderation",
@@ -1946,6 +2065,21 @@ async def viewschedule(ctx):
 	em.add_field(name="**Syntax**", value=".viewschedule")
 	await ctx.send(embed=em)
 
+@help.command()
+async def getclass(ctx):
+	em = discord.Embed(
+        title="Getclass",
+        description="Gets you or another person's current or next class")
+	em.add_field(name="**Syntax**", value=".getclass [optional: next] [optional: @person]")
+	await ctx.send(embed=em)
+
+@help.command()
+async def period(ctx):
+	em = discord.Embed(
+        title="Period",
+        description="Sends the current or next period number")
+	em.add_field(name="**Syntax**", value=".period [optional: next]")
+	await ctx.send(embed=em)
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
