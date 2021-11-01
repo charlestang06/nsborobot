@@ -1367,9 +1367,13 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
                         font=txtfont)
 
     im2 = im2.save("temp.png")
-
+	im2.save(f".//schedules//{ctx.author.id}.png")
     await ctx.send(file=discord.File(".//temp.png"))
+	
 
+@bot.command()
+async def viewschedule(ctx):
+	await ctx.send(file=discord.File(f".//schedules/{ctx.author.id}.png"))
 
 @bot.command()
 async def clubs(ctx):
