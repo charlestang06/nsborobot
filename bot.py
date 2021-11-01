@@ -1372,7 +1372,12 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
 
 @bot.command()
 async def viewschedule(ctx):
-	await ctx.send(file=discord.File(f".//schedules/{ctx.author.id}.png"))
+    try:	
+        f = open(f".//schedules/{ctx.author.id}.png")
+        await ctx.send(file=discord.File(f".//schedules/{ctx.author.id}.png"))
+    except IOError:
+    	await ctx.send("You did not create a schedule yet, use .schedule or .help schedule to learn more about the command")
+	
 
 @bot.command()
 async def clubs(ctx):
@@ -1915,7 +1920,7 @@ async def schedule(ctx):
     em = discord.Embed(
         title="Schedule",
         description=
-        "Creates a schedule (School Year 2021-2022). Keep each class name to one word without spaces"
+        "Creates a schedule (School Year 2021-2022). Keep each class name to one word without spaces. Once initially created, you can update your schedule with the same command, or you can .viewschedule to get your schedule"
     )
     em.add_field(
         name="**Syntax**",
@@ -1926,12 +1931,20 @@ async def schedule(ctx):
 
 
 @help.command()
-async def covid():
+async def covid(ctx):
     em = discord.Embed(
         title="Covid",
         description="Sends the weekly COVID-19 data of NSBORO schools.")
     em.add_field(name="**Syntax**", value=".covid")
     await ctx.send(embed=em)
+
+@help.command()
+async def viewschedule(ctx):
+	em = discord.Embed(
+        title="Viewschedule",
+        description="Sends your saved schedule.")
+	em.add_field(name="**Syntax**", value=".viewschedule")
+	await ctx.send(embed=em)
 
 
 my_secret = os.environ['serverkey']
