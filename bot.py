@@ -1366,9 +1366,8 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
                         new_schedule[6] + "\n9:35-10:25 AM", (255, 255, 255),
                         font=txtfont)
 
-    im2 = im2.save("temp.png")
-    im2.save(f".//schedules//{ctx.author.id}.png")
-    await ctx.send(file=discord.File(".//temp.png"))
+    im2 = im2.save(f".//schedules//{ctx.author.id}.png")
+    await ctx.send(file=discord.File(f".//schedules//{ctx.author.id}.png"))
 	
 
 @bot.command()
