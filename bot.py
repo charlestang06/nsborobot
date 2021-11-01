@@ -1391,12 +1391,16 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
 
 
 @bot.command()
-async def viewschedule(ctx):
+async def viewschedule(ctx, user:discord.Member = None):
+    if user == None:
+        user = ctx.author
+    userID = user.id
+		
     try:	
-        f = open(f".//schedules/{ctx.author.id}.png")
-        await ctx.send(file=discord.File(f".//schedules/{ctx.author.id}.png"))
+        f = open(f".//schedules/{userID}.png")
+        await ctx.send(file=discord.File(f".//schedules/{userID}.png"))
     except IOError:
-    	await ctx.send("You did not create a schedule yet, use .schedule or .help schedule to learn more about the command")
+    	await ctx.send(f"{user.mention} did not create a schedule yet, use .schedule or .help schedule to learn more about the command")
 	
 
 
@@ -2061,8 +2065,8 @@ async def covid(ctx):
 async def viewschedule(ctx):
 	em = discord.Embed(
         title="Viewschedule",
-        description="Sends your saved schedule.")
-	em.add_field(name="**Syntax**", value=".viewschedule")
+        description="Sends your or another person's saved schedule.")
+	em.add_field(name="**Syntax**", value=".viewschedule [optional: @person]")
 	await ctx.send(embed=em)
 
 @help.command()
