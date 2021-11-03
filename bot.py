@@ -19,7 +19,13 @@ from Screenshot import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+import urllib.parse
+import urllib.request
+from googletrans import Translator, constants
+from pprint import pprint
+
+os.system('pip install googletrans==3.1.0a0')
 
 chrome_options = Options()
 chrome_options.add_argument('--no-sandbox')
@@ -47,13 +53,15 @@ worksheet2 = sh2.worksheet("Sheet1")
 sh3 = gc.open("classes")
 worksheet3 = sh3.worksheet("Sheet1")
 
+sh4 = gc.open("nsborobotHomework")
+worksheet4 = sh4.worksheet("Sheet1")
+
 num_names = 150
 list_names = worksheet.get_all_values()
 list_names = sorted(list_names, key=lambda x: x[1].lower())
-
 list_UIDs = worksheet2.get_all_values()
-
 list_classes = worksheet3.get_all_values()
+list_hw = worksheet4.get_all_values()
 
 mainshop = [{
     "name":
@@ -1373,7 +1381,7 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
 
     im2 = im2.save(f".//schedules//{ctx.author.id}.png")
     await ctx.send(file=discord.File(f".//schedules//{ctx.author.id}.png"))
-	
+
     user_id = str(ctx.author.id)
     list_classes = worksheet3.get_all_values()
     ifFound = False
@@ -1381,27 +1389,28 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
         if user_id == list_classes[i][0]:
             list_classes[i][1:] = [arg1, arg2, arg3, arg4, arg5, arg6, arg7]
             worksheet3.update(f'A1:H{len(list_classes)}', list_classes)
-            await ctx.send(
-                f"{user.name} schedule has been updated")
+            await ctx.send(f"{user.name} schedule has been updated")
             ifFound = True
     if ifFound == False:
-        list_classes.append([user_id, arg1, arg2, arg3, arg4, arg5, arg6, arg7])
+        list_classes.append(
+            [user_id, arg1, arg2, arg3, arg4, arg5, arg6, arg7])
         worksheet3.update(f'A1:H{len(list_classes)}', list_classes)
         await ctx.send(f"{user.name}'s schedule has been set")
 
 
 @bot.command()
-async def viewschedule(ctx, user:discord.Member = None):
+async def viewschedule(ctx, user: discord.Member = None):
     if user == None:
         user = ctx.author
     userID = user.id
-		
-    try:	
+
+    try:
         f = open(f".//schedules/{userID}.png")
         await ctx.send(file=discord.File(f".//schedules/{userID}.png"))
     except IOError:
-    	await ctx.send(f"{user.mention} did not create a schedule yet, use .schedule or .help schedule to learn more about the command")
-	
+        await ctx.send(
+            f"{user.mention} did not create a schedule yet, use .schedule or .help schedule to learn more about the command"
+        )
 
 
 @bot.command()
@@ -1472,7 +1481,8 @@ async def covid(ctx):
 
     await ctx.send(file=discord.File(".//ss.png"))
 
-@bot.group(invoke_without_command = True)
+
+@bot.group(invoke_without_command=True)
 async def getclass(ctx, user: discord.Member = None):
     list_classes = worksheet3.get_all_values()
     if user == None:
@@ -1480,25 +1490,26 @@ async def getclass(ctx, user: discord.Member = None):
     userID = user.id
 
     ifFound = False
-    
+
     for i in range(len(list_classes)):
-	    if list_classes[i][0] == str(user.id):
-		    classes = list_classes[i][1:]
-		    ifFound = True
-		    break
-    
+        if list_classes[i][0] == str(user.id):
+            classes = list_classes[i][1:]
+            ifFound = True
+            break
+
     if ifFound == False:
-	    await ctx.send(f"{user.mention} has not set their schedule yet using .schedule")
+        await ctx.send(
+            f"{user.mention} has not set their schedule yet using .schedule")
     else:
         periods = [[1, 2, 3, 4, 5, 6, 7], [2, 1, 4, 5, 6, 7, 3],
-               [1, 2, 5, 6, 7, 3, 4], [2, 1, 6, 7, 2, 3, 4, 5],
-               [1, 2, 7, 3, 4, 5, 6]]
+                   [1, 2, 5, 6, 7, 3, 4], [2, 1, 6, 7, 2, 3, 4, 5],
+                   [1, 2, 7, 3, 4, 5, 6]]
 
         timeEnd = [[540, 600, 645, 690, 780, 825, 870],
-               [525, 570, 625, 690, 780, 825, 870],
-               [540, 600, 645, 690, 780, 825, 870],
-               [525, 570, 630, 690, 780, 825, 870],
-               [525, 570, 625, 690, 780, 825, 870]]
+                   [525, 570, 625, 690, 780, 825, 870],
+                   [540, 600, 645, 690, 780, 825, 870],
+                   [525, 570, 630, 690, 780, 825, 870],
+                   [525, 570, 625, 690, 780, 825, 870]]
 
         now = datetime.now().time()
         currentDay = datetime.today().weekday()
@@ -1513,13 +1524,16 @@ async def getclass(ctx, user: discord.Member = None):
 
         for i in range(len(timeEnd[currentDay])):
             if currentMin < timeEnd[currentDay][i] and currentMin > 480:
-                currentPeriod = classes[periods[currentDay][i]-1]
+                currentPeriod = classes[periods[currentDay][i] - 1]
                 break
-		
-        em = discord.Embed(title=f"{user.name} Class", description=currentPeriod, color=discord.Color.orange())
+
+        em = discord.Embed(title=f"{user.name} Class",
+                           description=currentPeriod,
+                           color=discord.Color.orange())
 
         await ctx.send(embed=em)
-	
+
+
 @getclass.command()
 async def next(ctx, user: discord.Member = None):
     list_classes = worksheet3.get_all_values()
@@ -1528,25 +1542,26 @@ async def next(ctx, user: discord.Member = None):
     userID = user.id
 
     ifFound = False
-    
+
     for i in range(len(list_classes)):
-	    if list_classes[i][0] == str(user.id):
-		    classes = list_classes[i][1:]
-		    ifFound = True
-		    break
-    
+        if list_classes[i][0] == str(user.id):
+            classes = list_classes[i][1:]
+            ifFound = True
+            break
+
     if ifFound == False:
-	    await ctx.send(f"{user.mention} has not set their schedule yet using .schedule")
+        await ctx.send(
+            f"{user.mention} has not set their schedule yet using .schedule")
     else:
         periods = [[1, 2, 3, 4, 5, 6, 7], [2, 1, 4, 5, 6, 7, 3],
-               [1, 2, 5, 6, 7, 3, 4], [2, 1, 6, 7, 2, 3, 4, 5],
-               [1, 2, 7, 3, 4, 5, 6]]
+                   [1, 2, 5, 6, 7, 3, 4], [2, 1, 6, 7, 2, 3, 4, 5],
+                   [1, 2, 7, 3, 4, 5, 6]]
 
         timeEnd = [[540, 600, 645, 690, 780, 825, 870],
-               [525, 570, 625, 690, 780, 825, 870],
-               [540, 600, 645, 690, 780, 825, 870],
-               [525, 570, 630, 690, 780, 825, 870],
-               [525, 570, 625, 690, 780, 825, 870]]
+                   [525, 570, 625, 690, 780, 825, 870],
+                   [540, 600, 645, 690, 780, 825, 870],
+                   [525, 570, 630, 690, 780, 825, 870],
+                   [525, 570, 625, 690, 780, 825, 870]]
 
         now = datetime.now().time()
         currentDay = datetime.today().weekday()
@@ -1564,12 +1579,15 @@ async def next(ctx, user: discord.Member = None):
                 if i == 6:
                     currentPeriod = "Done with school after this period!"
                 else:
-                    currentPeriod = classes[periods[currentDay][i+1]-1]
+                    currentPeriod = classes[periods[currentDay][i + 1] - 1]
                     break
-		
-        em = discord.Embed(title=f"{user.name} Next Class", description=currentPeriod, color=discord.Color.orange())
+
+        em = discord.Embed(title=f"{user.name} Next Class",
+                           description=currentPeriod,
+                           color=discord.Color.orange())
 
         await ctx.send(embed=em)
+
 
 @bot.group(invoke_without_command=True)
 async def period(ctx):
@@ -1643,6 +1661,263 @@ async def next(ctx):
 
     await ctx.send(embed=em)
 
+@bot.group(invoke_without_command = True)
+async def hw(ctx):
+    list_hw = worksheet4.get_all_values()
+    em = discord.Embed(
+        title=f"{ctx.author}'s Homework",
+        description=f"{ctx.author}'s homework for the day of {date.today()}",
+        color=discord.Color.orange())
+    found = False
+    for i in range(len(list_hw)):
+        if list_hw[i][0] == str(ctx.author.id):
+            found = True
+            if len(list_hw[i]) <= 1: 
+                await ctx.send("You have nothing to do!")
+                return
+            else:
+                for j in range(1, len(list_hw[i][1:])+1):
+                    if list_hw[i][j] == '':
+                        continue
+                    em.add_field(name=f"Task {j}", value=list_hw[i][j])
+            break
+    if found == False:
+        await ctx.send("You have no homework to do!")
+    else:
+        await ctx.send(embed=em)
+
+@hw.command()
+async def add(ctx, *, args):
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    list_hw = worksheet4.get_all_values()
+    found = False
+    found2 = False
+    for i in range(len(list_hw)):
+        if list_hw[i][0] == str(ctx.author.id):
+            found = True
+            if i >= 26: 
+                await ctx.send("You have exceeded the number of total tasks")
+                return
+            for j in range(1, len(list_hw[i])):
+                if list_hw[i][j] == '':
+                    list_hw[i][j] = args
+                    found2 = True
+                    break
+            if found2 == False:
+                list_hw[i].append(args)
+            await ctx.send(f"Task: {args} added to your homework list")
+            break
+    if found == False:
+        list_hw.append([str(ctx.author.id), args])
+        await ctx.send(f"Task: {args} added to your homework list")
+    worksheet4.update(f'A1:{alphabet[len(list_hw[0])-1].upper()}{len(list_hw)}', list_hw)
+
+@hw.command()
+async def remove(ctx, arg):
+	alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+	list_hw = worksheet4.get_all_values()
+	arg = int(arg)
+	found = False
+	if arg == 0:
+		await ctx.send("Task 0 is not a thing!")
+		return
+	for i in range(len(list_hw)):
+		if list_hw[i][0] == str(ctx.author.id):
+			found = True
+			if len(list_hw[i]) <= arg:
+				await ctx.send("You do not have that many tasks!")
+				return
+			await ctx.send(f"Task: {list_hw[i][arg]} removed from your homework list")
+			list_hw[i].pop(arg)
+			runningMax = 0
+			for person in list_hw:
+				runningMax = max(runningMax, len(person))
+			worksheet4.clear()
+			worksheet4.update(f'A1:{alphabet[runningMax-1].upper()}{len(list_hw)}', list_hw)
+	
+	if found == False:
+		await ctx.send(f"You do not have any homework!")
+
+@hw.command()
+async def clear(ctx):
+	alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+	list_hw = worksheet4.get_all_values()
+	for i in range(len(list_hw)):
+		if list_hw[i][0] == str(ctx.author.id):
+			found = True
+			list_hw[i] = [str(ctx.author.id)]
+			runningMax = 0
+			for person in list_hw:
+				runningMax = max(runningMax, len(person))
+			worksheet4.clear()
+			worksheet4.update(f'A1:{alphabet[runningMax-1].upper()}{len(list_hw)}', list_hw)
+			await ctx.send("All homework marked as done!")
+	
+	if found == False:
+		await ctx.send(f"You don't have any homework!")
+
+@bot.group(invoke_without_command=True)
+async def translate(ctx, toLang, *, args):
+    translator = Translator()
+    translation = translator.translate(args, dest=toLang)
+    em = discord.Embed(
+        title="NSBORO Bot Translater",
+        description= f"{translation.origin} ({translation.src})",
+        color = 0xe91e63
+    )
+    em.add_field(name="**Translation**", value=f"{translation.text} ({translation.dest})")
+    await ctx.send(embed=em)
+
+@translate.command()
+async def codes(ctx):
+    em = discord.Embed(
+        title="NSBORO Bot Translater Language Codes Pt. 1",
+        description= "Language Codes for Supported Languages",
+        color = 0xe91e63
+    )
+    em2 = discord.Embed(
+        title="NSBORO Bot Translater Language Codes Pt. 2",
+        description= "Language Codes for Supported Languages",
+        color = 0xe91e63
+    )
+    em3 = discord.Embed(
+        title="NSBORO Bot Translater Language Codes Pt. 3",
+        description= "Language Codes for Supported Languages",
+        color = 0xe91e63
+    )
+    em4 = discord.Embed(
+        title="NSBORO Bot Translater Language Codes Pt. 4",
+        description= "Language Codes for Supported Languages",
+        color = 0xe91e63
+    )
+
+    LANGUAGES = {
+    'af': 'afrikaans',
+    'sq': 'albanian',
+    'am': 'amharic',
+    'ar': 'arabic',
+    'hy': 'armenian',
+    'az': 'azerbaijani',
+    'eu': 'basque',
+    'be': 'belarusian',
+    'bn': 'bengali',
+    'bs': 'bosnian',
+    'bg': 'bulgarian',
+    'ca': 'catalan',
+    'ceb': 'cebuano',
+    'ny': 'chichewa',
+    'zh-cn': 'chinese (simplified)',
+    'zh-tw': 'chinese (traditional)',
+    'co': 'corsican',
+    'hr': 'croatian',
+    'cs': 'czech',
+    'da': 'danish',
+    'nl': 'dutch',
+    'en': 'english',
+    'eo': 'esperanto',
+    'et': 'estonian',
+    'tl': 'filipino',
+    'fi': 'finnish',
+    'fr': 'french',
+    'fy': 'frisian',
+    'gl': 'galician',
+    'ka': 'georgian',
+    'de': 'german',
+    'el': 'greek',
+    'gu': 'gujarati',
+    'ht': 'haitian creole',
+    'ha': 'hausa',
+    'haw': 'hawaiian',
+    'iw': 'hebrew',
+    'he': 'hebrew',
+    'hi': 'hindi',
+    'hmn': 'hmong',
+    'hu': 'hungarian',
+    'is': 'icelandic',
+    'ig': 'igbo',
+    'id': 'indonesian',
+    'ga': 'irish',
+    'it': 'italian',
+    'ja': 'japanese',
+    'jw': 'javanese',
+    'kn': 'kannada',
+    'kk': 'kazakh',
+    'km': 'khmer',
+    'ko': 'korean',
+    'ku': 'kurdish (kurmanji)',
+    'ky': 'kyrgyz',
+    'lo': 'lao',
+    'la': 'latin',
+    'lv': 'latvian',
+    'lt': 'lithuanian',
+    'lb': 'luxembourgish',
+    'mk': 'macedonian',
+    'mg': 'malagasy',
+    'ms': 'malay',
+    'ml': 'malayalam',
+    'mt': 'maltese',
+    'mi': 'maori',
+    'mr': 'marathi',
+    'mn': 'mongolian',
+    'my': 'myanmar (burmese)',
+    'ne': 'nepali',
+    'no': 'norwegian',
+    'or': 'odia',
+    'ps': 'pashto',
+    'fa': 'persian',
+    'pl': 'polish',
+    'pt': 'portuguese',
+    'pa': 'punjabi',
+    'ro': 'romanian',
+    'ru': 'russian',
+    'sm': 'samoan',
+    'gd': 'scots gaelic',
+    'sr': 'serbian',
+    'st': 'sesotho',
+    'sn': 'shona',
+    'sd': 'sindhi',
+    'si': 'sinhala',
+    'sk': 'slovak',
+    'sl': 'slovenian',
+    'so': 'somali',
+    'es': 'spanish',
+    'su': 'sundanese',
+    'sw': 'swahili',
+    'sv': 'swedish',
+    'tg': 'tajik',
+    'ta': 'tamil',
+    'te': 'telugu',
+    'th': 'thai',
+    'tr': 'turkish',
+    'uk': 'ukrainian',
+    'ur': 'urdu',
+    'ug': 'uyghur',
+    'uz': 'uzbek',
+    'vi': 'vietnamese',
+    'cy': 'welsh',
+    'xh': 'xhosa',
+    'yi': 'yiddish',
+    'yo': 'yoruba',
+    'zu': 'zulu',
+	}
+    counter = 0
+    for key in LANGUAGES:
+        counter += 1
+        if counter > 25 and counter <= 50:
+            em.add_field(name=f"**{LANGUAGES[key]}**", value=key)
+        elif counter > 50 and counter <= 75:
+            em2.add_field(name=f"**{LANGUAGES[key]}**", value=key)
+        elif counter > 75 and counter <= 100:
+            em3.add_field(name=f"**{LANGUAGES[key]}**", value=key)
+        elif counter > 100 and counter <= 125:
+            em4.add_field(name=f"**{LANGUAGES[key]}**", value=key)
+
+    await ctx.send(embed=em)
+    await ctx.send(embed=em2)
+    await ctx.send(embed=em3)
+    await ctx.send(embed=em4)
+
+
 
 @bot.group(invoke_without_command=True)
 async def help(ctx):
@@ -1654,7 +1929,7 @@ async def help(ctx):
     em.add_field(
         name="General",
         value=
-        "color, setname, getname, stats, rules, studymode, invite, report, schedule, viewschedule, getUID, setUID, clubs, covid, period, getclass"
+        "color, setname, getname, stats, rules, studymode, invite, report, schedule, viewschedule, getUID, setUID, clubs, covid, period, getclass, hw, translate"
     )
     em.add_field(
         name="Moderation",
@@ -1667,7 +1942,6 @@ async def help(ctx):
         "bal, beg, pray, give, rob, lottery, slots, shop, buy, sell, use, stock"
     )
     em.add_field(name="Miscellaneous", value="fight, kill, basta, kyt")
-
     await ctx.send(embed=em)
 
 
@@ -2061,29 +2335,46 @@ async def covid(ctx):
     em.add_field(name="**Syntax**", value=".covid")
     await ctx.send(embed=em)
 
+
 @help.command()
 async def viewschedule(ctx):
-	em = discord.Embed(
+    em = discord.Embed(
         title="Viewschedule",
         description="Sends your or another person's saved schedule.")
-	em.add_field(name="**Syntax**", value=".viewschedule [optional: @person]")
-	await ctx.send(embed=em)
+    em.add_field(name="**Syntax**", value=".viewschedule [optional: @person]")
+    await ctx.send(embed=em)
+
 
 @help.command()
 async def getclass(ctx):
-	em = discord.Embed(
+    em = discord.Embed(
         title="Getclass",
         description="Gets you or another person's current or next class")
-	em.add_field(name="**Syntax**", value=".getclass [optional: next] [optional: @person]")
-	await ctx.send(embed=em)
+    em.add_field(name="**Syntax**",
+                 value=".getclass [optional: next] [optional: @person]")
+    await ctx.send(embed=em)
+
 
 @help.command()
 async def period(ctx):
-	em = discord.Embed(
-        title="Period",
-        description="Sends the current or next period number")
-	em.add_field(name="**Syntax**", value=".period [optional: next]")
-	await ctx.send(embed=em)
+    em = discord.Embed(title="Period",
+                       description="Sends the current or next period number")
+    em.add_field(name="**Syntax**", value=".period [optional: next]")
+    await ctx.send(embed=em)
+
+@help.command()
+async def hw(ctx):
+    em = discord.Embed(title="HW",
+                       description="Sends a list of all homework/tasks. Can be updated with .hw add/remove/clear")
+    em.add_field(name="**Syntax**", value=".hw [optional: add/remove/clear]")
+    await ctx.send(embed=em)
+
+@help.command()
+async def translate(ctx):
+    em = discord.Embed(title="Translate", description="Translates one language into another")
+    em.add_field(name="**Syntax**", value=".translate [optional: codes] [language code to be translated into (ex. es) [words]")
+    em.add_field(name="**Common Language Codes**", value="Spanish - es \nFrench - fr\n Chinese - zh-CN \n English - en \nJapanese - ja \nArabic - ar \nRussian - ru")
+    await ctx.send(embed=em)
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
