@@ -1667,7 +1667,7 @@ async def hw(ctx):
     list_hw = worksheet4.get_all_values()
     em = discord.Embed(
         title=f"{ctx.author}'s Homework",
-        description=f"{ctx.author}'s homework for the day of {date.today()}",
+        description=f"```{ctx.author}'s homework for the day of {date.today()}```",
         color=discord.Color.orange())
     found = False
     for i in range(len(list_hw)):
@@ -1708,7 +1708,7 @@ async def add(ctx, *, args):
                     break
             if found2 == False:
                 list_hw[i].append(args)
-            await ctx.send(f"Task: {args} added to your homework list")
+            await ctx.send(f"Task: `{args}` added to your homework list")
             break
     if found == False:
         list_hw.append([str(ctx.author.id), args])
@@ -1732,13 +1732,13 @@ async def remove(ctx, arg):
             if len(list_hw[i]) <= arg:
                 await ctx.send("You do not have that many tasks!")
                 return
-            await ctx.send(f"Task: {list_hw[i][arg]} removed from your homework list")
+            await ctx.send(f"Task: `{list_hw[i][arg]}` removed from your homework list")
             list_hw[i].pop(arg)
             runningMax = 0
             for person in list_hw:
                 runningMax = max(runningMax, len(person))
             worksheet4.clear()
-            worksheet4.update(f'A1:{alphabet[runningMax - 1].upper()}{len(list_hw)}', list_hw)
+            worksheet4.update(f'A1:{alphabet[len(list_hw[0]) - 1].upper()}{len(list_hw)}', list_hw)
 
     if found == False:
         await ctx.send(f"You do not have any homework!")
@@ -2037,12 +2037,16 @@ async def vent(ctx):
     person = bot.get_user(ctx.author.id)
     await person.send("Vent here, no one is listening!")
 
+
+
+
+
 @bot.group(invoke_without_command=True)
 async def help(ctx):
     em = discord.Embed(
         title=".help on NSBORO Bot",
         description=
-        "Some useful commands for this bot. The bot prefix is \".\". Use .help [command] for more information on each command.",
+        "```Some useful commands for this bot. The bot prefix is \".\". Use .help [command] for more information on each command.```",
         color=discord.Color.orange())
     em.add_field(
         name="General",
@@ -2504,7 +2508,6 @@ async def therapy(ctx):
     em.add_field(name="**Syntax**",
                  value=".therapy")
     await ctx.send(embed=em)
-    
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
