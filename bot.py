@@ -65,13 +65,13 @@ list_hw = worksheet4.get_all_values()
 
 mainshop = [{
     "name":
-    "basta_bible",
+        "basta_bible",
     "price":
-    100,
+        100,
     "description":
-    "Religion",
+        "Religion",
     "use":
-    "You pray for days and days on end, Basta will always be our God"
+        "You pray for days and days on end, Basta will always be our God"
 }, {
     "name": "pc",
     "price": 500,
@@ -89,22 +89,22 @@ mainshop = [{
     "use": "studymode was definitely not copied"
 }, {
     "name":
-    "indentured_servant",
+        "indentured_servant",
     "price":
-    10,
+        10,
     "description":
-    "hardworking and strong",
+        "hardworking and strong",
     "use":
-    "hey! human rights boi. the servant works very hard so you get 100 coins owner"
+        "hey! human rights boi. the servant works very hard so you get 100 coins owner"
 }, {
     "name":
-    "basta_blessings",
+        "basta_blessings",
     "price":
-    1000,
+        1000,
     "description":
-    "gives you luck",
+        "gives you luck",
     "use":
-    "Basta blesses you kindness and happiness, have a wonderful day!!"
+        "Basta blesses you kindness and happiness, have a wonderful day!!"
 }, {
     "name": "kyt_vote",
     "price": 20,
@@ -127,13 +127,13 @@ mainshop = [{
     "use": "you play fortnite while Dan default dances on you"
 }, {
     "name":
-    "calculator",
+        "calculator",
     "price":
-    99,
+        99,
     "description":
-    "get your sweet ti-84 plus ce",
+        "get your sweet ti-84 plus ce",
     "use":
-    "you download pokemon on your ti-84+ce, smh such a waste of money"
+        "you download pokemon on your ti-84+ce, smh such a waste of money"
 }, {
     "name": "stock",
     "price": 349028,
@@ -141,13 +141,13 @@ mainshop = [{
     "use": "you cannot use this, check the price using .stock"
 }, {
     "name":
-    "minecraft",
+        "minecraft",
     "price":
-    50,
+        50,
     "description":
-    "minecraft is epic",
+        "minecraft is epic",
     "use":
-    "You create a survival world.....you get blown up by a creeper"
+        "You create a survival world.....you get blown up by a creeper"
 }]
 
 periods = [
@@ -451,7 +451,7 @@ async def setname(ctx, *, arg):
     worksheet.update(f'A1:B{len(list_names)}', list_names)
     await ctx.send(f"Your name has sucessfully been set to {name}")
 
-    #sending namelist in member channel
+    # sending namelist in member channel
     channel = bot.get_channel(789896145781391370)
     await channel.purge(limit=10)
 
@@ -519,7 +519,7 @@ async def changename(ctx, user: discord.User, *, arg):
         worksheet.update(f'A1:B{len(list_names)}', list_names)
         await ctx.send(f"{user.name} IRL name has been set to {arg}")
 
-    #sending namelist in member channel
+    # sending namelist in member channel
     channel = bot.get_channel(789896145781391370)
     await channel.purge(limit=10)
 
@@ -1227,7 +1227,7 @@ async def panda(ctx):
 async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
     new_schedule = periods[:]
 
-    #assign
+    # assign
     new_schedule[0] = arg1
     new_schedule[1] = arg2
     new_schedule[2] = arg3
@@ -1235,14 +1235,14 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
     new_schedule[4] = arg5
     new_schedule[5] = arg6
     new_schedule[6] = arg7
-    #image stuff
+    # image stuff
     im1 = Image.open("schedule template.PNG")
 
     im2 = im1.copy()
 
     image_editable = ImageDraw.Draw(im2)
 
-    #txtfont = ImageFont.truetype("arial.ttf", 25)
+    # txtfont = ImageFont.truetype("arial.ttf", 25)
     txtfont = ImageFont.truetype("DejaVuSansMono-Bold.ttf", 16)
 
     # period 1
@@ -1459,10 +1459,10 @@ async def covid(ctx):
     print(button)
     button.click()
 
-    #get current window handle
+    # get current window handle
     p = driver.current_window_handle
 
-    #get first child window
+    # get first child window
     chwd = driver.window_handles
 
     for w in chwd:
@@ -1471,7 +1471,7 @@ async def covid(ctx):
 
     driver.set_window_size(1920, 2000)
 
-    #ctrl + alt + [
+    # ctrl + alt + [
     a = ActionChains(driver)
     a.key_down(Keys.CONTROL).key_down(Keys.ALT).send_keys('[').key_up(
         Keys.CONTROL).key_up(Keys.ALT).perform()
@@ -1661,7 +1661,8 @@ async def next(ctx):
 
     await ctx.send(embed=em)
 
-@bot.group(invoke_without_command = True)
+
+@bot.group(invoke_without_command=True)
 async def hw(ctx):
     list_hw = worksheet4.get_all_values()
     em = discord.Embed(
@@ -1672,11 +1673,11 @@ async def hw(ctx):
     for i in range(len(list_hw)):
         if list_hw[i][0] == str(ctx.author.id):
             found = True
-            if len(list_hw[i]) <= 1: 
+            if len(list_hw[i]) <= 1:
                 await ctx.send("You have nothing to do!")
                 return
             else:
-                for j in range(1, len(list_hw[i][1:])+1):
+                for j in range(1, len(list_hw[i][1:]) + 1):
                     if list_hw[i][j] == '':
                         continue
                     em.add_field(name=f"Task {j}", value=list_hw[i][j])
@@ -1686,16 +1687,18 @@ async def hw(ctx):
     else:
         await ctx.send(embed=em)
 
+
 @hw.command()
 async def add(ctx, *, args):
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
     list_hw = worksheet4.get_all_values()
     found = False
     found2 = False
     for i in range(len(list_hw)):
         if list_hw[i][0] == str(ctx.author.id):
             found = True
-            if i >= 26: 
+            if i >= 26:
                 await ctx.send("You have exceeded the number of total tasks")
                 return
             for j in range(1, len(list_hw[i])):
@@ -1710,51 +1713,78 @@ async def add(ctx, *, args):
     if found == False:
         list_hw.append([str(ctx.author.id), args])
         await ctx.send(f"Task: {args} added to your homework list")
-    worksheet4.update(f'A1:{alphabet[len(list_hw[0])-1].upper()}{len(list_hw)}', list_hw)
+    worksheet4.update(f'A1:{alphabet[len(list_hw[0]) - 1].upper()}{len(list_hw)}', list_hw)
+
 
 @hw.command()
 async def remove(ctx, arg):
-	alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-	list_hw = worksheet4.get_all_values()
-	arg = int(arg)
-	found = False
-	if arg == 0:
-		await ctx.send("Task 0 is not a thing!")
-		return
-	for i in range(len(list_hw)):
-		if list_hw[i][0] == str(ctx.author.id):
-			found = True
-			if len(list_hw[i]) <= arg:
-				await ctx.send("You do not have that many tasks!")
-				return
-			await ctx.send(f"Task: {list_hw[i][arg]} removed from your homework list")
-			list_hw[i].pop(arg)
-			runningMax = 0
-			for person in list_hw:
-				runningMax = max(runningMax, len(person))
-			worksheet4.clear()
-			worksheet4.update(f'A1:{alphabet[runningMax-1].upper()}{len(list_hw)}', list_hw)
-	
-	if found == False:
-		await ctx.send(f"You do not have any homework!")
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
+    list_hw = worksheet4.get_all_values()
+    arg = int(arg)
+    found = False
+    if arg == 0:
+        await ctx.send("Task 0 is not a thing!")
+        return
+    for i in range(len(list_hw)):
+        if list_hw[i][0] == str(ctx.author.id):
+            found = True
+            if len(list_hw[i]) <= arg:
+                await ctx.send("You do not have that many tasks!")
+                return
+            await ctx.send(f"Task: {list_hw[i][arg]} removed from your homework list")
+            list_hw[i].pop(arg)
+            runningMax = 0
+            for person in list_hw:
+                runningMax = max(runningMax, len(person))
+            worksheet4.clear()
+            worksheet4.update(f'A1:{alphabet[runningMax - 1].upper()}{len(list_hw)}', list_hw)
+
+    if found == False:
+        await ctx.send(f"You do not have any homework!")
+
+@hw.command()
+async def change(ctx, arg1, *, arg2):
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
+    list_hw = worksheet4.get_all_values()
+    arg1 = int(arg1)
+    found = False
+    if arg1 == 0:
+        await ctx.send("Task 0 is not a thing!")
+        return
+    for i in range(len(list_hw)):
+        if list_hw[i][0] == str(ctx.author.id):
+            found = True
+            if len(list_hw[i]) <= arg1:
+                await ctx.send("You do not have that many tasks!")
+                return
+            await ctx.send(f"Task: `{list_hw[i][arg1]}` changed to `{arg2}` on your homework list")
+            list_hw[i][arg1] = arg2
+            worksheet4.clear()
+            worksheet4.update(f'A1:{alphabet[len(list_hw[0]) - 1].upper()}{len(list_hw)}', list_hw)
+    if found == False:
+        await ctx.send(f"You do not have any homework!")
 
 @hw.command()
 async def clear(ctx):
-	alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-	list_hw = worksheet4.get_all_values()
-	for i in range(len(list_hw)):
-		if list_hw[i][0] == str(ctx.author.id):
-			found = True
-			list_hw[i] = [str(ctx.author.id)]
-			runningMax = 0
-			for person in list_hw:
-				runningMax = max(runningMax, len(person))
-			worksheet4.clear()
-			worksheet4.update(f'A1:{alphabet[runningMax-1].upper()}{len(list_hw)}', list_hw)
-			await ctx.send("All homework marked as done!")
-	
-	if found == False:
-		await ctx.send(f"You don't have any homework!")
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
+    list_hw = worksheet4.get_all_values()
+    for i in range(len(list_hw)):
+        if list_hw[i][0] == str(ctx.author.id):
+            found = True
+            list_hw[i] = [str(ctx.author.id)]
+            runningMax = 0
+            for person in list_hw:
+                runningMax = max(runningMax, len(person))
+            worksheet4.clear()
+            worksheet4.update(f'A1:{alphabet[runningMax - 1].upper()}{len(list_hw)}', list_hw)
+            await ctx.send("All homework marked as done!")
+
+    if found == False:
+        await ctx.send(f"You don't have any homework!")
+
 
 @bot.group(invoke_without_command=True)
 async def translate(ctx, toLang, *, args):
@@ -1762,144 +1792,145 @@ async def translate(ctx, toLang, *, args):
     translation = translator.translate(args, dest=toLang)
     em = discord.Embed(
         title="NSBORO Bot Translater",
-        description= f"{translation.origin} ({translation.src})",
-        color = 0xe91e63
+        description=f"{translation.origin} ({translation.src})",
+        color=0xe91e63
     )
     em.add_field(name="**Translation**", value=f"{translation.text} ({translation.dest})")
     await ctx.send(embed=em)
+
 
 @translate.command()
 async def codes(ctx):
     em = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 1",
-        description= "Language Codes for Supported Languages",
-        color = 0xe91e63
+        description="Language Codes for Supported Languages",
+        color=0xe91e63
     )
     em2 = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 2",
-        description= "Language Codes for Supported Languages",
-        color = 0xe91e63
+        description="Language Codes for Supported Languages",
+        color=0xe91e63
     )
     em3 = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 3",
-        description= "Language Codes for Supported Languages",
-        color = 0xe91e63
+        description="Language Codes for Supported Languages",
+        color=0xe91e63
     )
     em4 = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 4",
-        description= "Language Codes for Supported Languages",
-        color = 0xe91e63
+        description="Language Codes for Supported Languages",
+        color=0xe91e63
     )
 
     LANGUAGES = {
-    'af': 'afrikaans',
-    'sq': 'albanian',
-    'am': 'amharic',
-    'ar': 'arabic',
-    'hy': 'armenian',
-    'az': 'azerbaijani',
-    'eu': 'basque',
-    'be': 'belarusian',
-    'bn': 'bengali',
-    'bs': 'bosnian',
-    'bg': 'bulgarian',
-    'ca': 'catalan',
-    'ceb': 'cebuano',
-    'ny': 'chichewa',
-    'zh-cn': 'chinese (simplified)',
-    'zh-tw': 'chinese (traditional)',
-    'co': 'corsican',
-    'hr': 'croatian',
-    'cs': 'czech',
-    'da': 'danish',
-    'nl': 'dutch',
-    'en': 'english',
-    'eo': 'esperanto',
-    'et': 'estonian',
-    'tl': 'filipino',
-    'fi': 'finnish',
-    'fr': 'french',
-    'fy': 'frisian',
-    'gl': 'galician',
-    'ka': 'georgian',
-    'de': 'german',
-    'el': 'greek',
-    'gu': 'gujarati',
-    'ht': 'haitian creole',
-    'ha': 'hausa',
-    'haw': 'hawaiian',
-    'iw': 'hebrew',
-    'he': 'hebrew',
-    'hi': 'hindi',
-    'hmn': 'hmong',
-    'hu': 'hungarian',
-    'is': 'icelandic',
-    'ig': 'igbo',
-    'id': 'indonesian',
-    'ga': 'irish',
-    'it': 'italian',
-    'ja': 'japanese',
-    'jw': 'javanese',
-    'kn': 'kannada',
-    'kk': 'kazakh',
-    'km': 'khmer',
-    'ko': 'korean',
-    'ku': 'kurdish (kurmanji)',
-    'ky': 'kyrgyz',
-    'lo': 'lao',
-    'la': 'latin',
-    'lv': 'latvian',
-    'lt': 'lithuanian',
-    'lb': 'luxembourgish',
-    'mk': 'macedonian',
-    'mg': 'malagasy',
-    'ms': 'malay',
-    'ml': 'malayalam',
-    'mt': 'maltese',
-    'mi': 'maori',
-    'mr': 'marathi',
-    'mn': 'mongolian',
-    'my': 'myanmar (burmese)',
-    'ne': 'nepali',
-    'no': 'norwegian',
-    'or': 'odia',
-    'ps': 'pashto',
-    'fa': 'persian',
-    'pl': 'polish',
-    'pt': 'portuguese',
-    'pa': 'punjabi',
-    'ro': 'romanian',
-    'ru': 'russian',
-    'sm': 'samoan',
-    'gd': 'scots gaelic',
-    'sr': 'serbian',
-    'st': 'sesotho',
-    'sn': 'shona',
-    'sd': 'sindhi',
-    'si': 'sinhala',
-    'sk': 'slovak',
-    'sl': 'slovenian',
-    'so': 'somali',
-    'es': 'spanish',
-    'su': 'sundanese',
-    'sw': 'swahili',
-    'sv': 'swedish',
-    'tg': 'tajik',
-    'ta': 'tamil',
-    'te': 'telugu',
-    'th': 'thai',
-    'tr': 'turkish',
-    'uk': 'ukrainian',
-    'ur': 'urdu',
-    'ug': 'uyghur',
-    'uz': 'uzbek',
-    'vi': 'vietnamese',
-    'cy': 'welsh',
-    'xh': 'xhosa',
-    'yi': 'yiddish',
-    'yo': 'yoruba',
-    'zu': 'zulu',
-	}
+        'af': 'afrikaans',
+        'sq': 'albanian',
+        'am': 'amharic',
+        'ar': 'arabic',
+        'hy': 'armenian',
+        'az': 'azerbaijani',
+        'eu': 'basque',
+        'be': 'belarusian',
+        'bn': 'bengali',
+        'bs': 'bosnian',
+        'bg': 'bulgarian',
+        'ca': 'catalan',
+        'ceb': 'cebuano',
+        'ny': 'chichewa',
+        'zh-cn': 'chinese (simplified)',
+        'zh-tw': 'chinese (traditional)',
+        'co': 'corsican',
+        'hr': 'croatian',
+        'cs': 'czech',
+        'da': 'danish',
+        'nl': 'dutch',
+        'en': 'english',
+        'eo': 'esperanto',
+        'et': 'estonian',
+        'tl': 'filipino',
+        'fi': 'finnish',
+        'fr': 'french',
+        'fy': 'frisian',
+        'gl': 'galician',
+        'ka': 'georgian',
+        'de': 'german',
+        'el': 'greek',
+        'gu': 'gujarati',
+        'ht': 'haitian creole',
+        'ha': 'hausa',
+        'haw': 'hawaiian',
+        'iw': 'hebrew',
+        'he': 'hebrew',
+        'hi': 'hindi',
+        'hmn': 'hmong',
+        'hu': 'hungarian',
+        'is': 'icelandic',
+        'ig': 'igbo',
+        'id': 'indonesian',
+        'ga': 'irish',
+        'it': 'italian',
+        'ja': 'japanese',
+        'jw': 'javanese',
+        'kn': 'kannada',
+        'kk': 'kazakh',
+        'km': 'khmer',
+        'ko': 'korean',
+        'ku': 'kurdish (kurmanji)',
+        'ky': 'kyrgyz',
+        'lo': 'lao',
+        'la': 'latin',
+        'lv': 'latvian',
+        'lt': 'lithuanian',
+        'lb': 'luxembourgish',
+        'mk': 'macedonian',
+        'mg': 'malagasy',
+        'ms': 'malay',
+        'ml': 'malayalam',
+        'mt': 'maltese',
+        'mi': 'maori',
+        'mr': 'marathi',
+        'mn': 'mongolian',
+        'my': 'myanmar (burmese)',
+        'ne': 'nepali',
+        'no': 'norwegian',
+        'or': 'odia',
+        'ps': 'pashto',
+        'fa': 'persian',
+        'pl': 'polish',
+        'pt': 'portuguese',
+        'pa': 'punjabi',
+        'ro': 'romanian',
+        'ru': 'russian',
+        'sm': 'samoan',
+        'gd': 'scots gaelic',
+        'sr': 'serbian',
+        'st': 'sesotho',
+        'sn': 'shona',
+        'sd': 'sindhi',
+        'si': 'sinhala',
+        'sk': 'slovak',
+        'sl': 'slovenian',
+        'so': 'somali',
+        'es': 'spanish',
+        'su': 'sundanese',
+        'sw': 'swahili',
+        'sv': 'swedish',
+        'tg': 'tajik',
+        'ta': 'tamil',
+        'te': 'telugu',
+        'th': 'thai',
+        'tr': 'turkish',
+        'uk': 'ukrainian',
+        'ur': 'urdu',
+        'ug': 'uyghur',
+        'uz': 'uzbek',
+        'vi': 'vietnamese',
+        'cy': 'welsh',
+        'xh': 'xhosa',
+        'yi': 'yiddish',
+        'yo': 'yoruba',
+        'zu': 'zulu',
+    }
     counter = 0
     for key in LANGUAGES:
         counter += 1
@@ -1917,7 +1948,94 @@ async def codes(ctx):
     await ctx.send(embed=em3)
     await ctx.send(embed=em4)
 
+@bot.group(invoke_without_command = True)
+async def therapy(ctx):
+    em = discord.Embed(
+        title=f"Mental Health Commands",
+        description=f"```These provide helpful tips and strategies to keep your mind healthy and relaxed!```",
+        color=discord.Color.orange())
+    em.add_field(name="`.therapy breathe`", value="Generates a breathing GIF!")
+    em.add_field(name="`.therapy hotlines`", value="Provides hotlines")
+    em.add_field(name="`.therapy motivation`", value="Generates a motivational message!")
+    em.add_field(name="`.therapy relax`", value="Generates a relaxing image!")
+    em.add_field(name="`.therapy vent`", value="Vent in dms! Everything will be kept private.")
 
+    await ctx.send(embed=em)
+
+@therapy.command()
+async def breathe(ctx):
+    links = ["https://i.pinimg.com/originals/1d/7a/6d/1d7a6df38bd0b1aab9d6c3b7c3d00779.gif",
+             "https://i.pinimg.com/originals/92/1d/d9/921dd92426d71b810df0edf61a9abffe.gif",
+             "https://www.mondaycampaigns.org/wp-content/uploads/2020/04/destress-monday-breathing-gif-circle-white-border.gif",
+             "https://smho-smso.ca/wp-content/uploads/2020/06/Four-square-breathing-EN.gif",
+             "https://cdn.discordapp.com/attachments/760988796249833472/837030298876379166/image0.gif",
+             "https://cdn.discordapp.com/attachments/760988796249833472/837031005327458324/image0.gif",
+             "https://cdn.doyou.com/wp/2016/12/giphy.gif",
+             "https://media4.giphy.com/media/TH5hwgzAUx0ZOWOsh6/giphy.gif",
+             "https://cdn.discordapp.com/attachments/760988796249833472/837030525981032569/image0.gif"]
+
+    em = discord.Embed(
+        title=f"Follow along with the GIF below!",
+        description="",
+        color=discord.Color.blue())
+    em.set_image(url=links[random.randrange(0, len(links))])
+    em.set_footer(text="Everything will be okay <3")
+
+    await ctx.send(embed=em)
+
+@therapy.command()
+async def hotlines(ctx):
+    em = discord.Embed(
+        title=f"Hotlines",
+        description="Crisis and Suicide Hotlines",
+        color=discord.Color.blue())
+    em.add_field(name="**General Crisis Line:**", value="> Text SUPPORT to 741-741")
+    em.add_field(name="**National Suicide Prevention Lifeline:**", value="> 1-800-273-8255")
+    em.add_field(name="**Online Chat:**", value="> https://suicidepreventionlifeline.org/chat/")
+    await ctx.send(embed=em)
+
+
+@therapy.command()
+async def motivation(ctx):
+    quotes = ["You're completely valid!", "You’re a true gift to the people in your life.", "You are loved!",
+              "Today will be a good day. Keep that in your head.",
+              "Sometimes when things are falling apart, they may actually be falling into the right place.",
+              "The world would be a better place if more people were like you!",
+              "Everything will be okay, I promise.", "Believe in yourself! Never give up!",
+              "It may seem like there's no hope, but things will get better eventually.", ]
+    em = discord.Embed(
+        title=f"Motivation",
+        description=f"```{quotes[random.randrange(0, len(quotes))]}```",
+        color=discord.Color.blue())
+    await ctx.send(embed=em)
+
+@therapy.command()
+async def relax(ctx):
+    links = ["https://thumbs.gfycat.com/ObedientEmptyGazelle-max-1mb.gif",
+             "https://64.media.tumblr.com/d01cd181bf81abc9ac6fc6f64e854371/291858a8d8307206-b2/s1280x1920/b7b903829cfcb292d026ae1e3fc46c426cc186ca.gif",
+             "https://i.pinimg.com/originals/41/ff/e2/41ffe25dce45496f8078aa4777913695.gif",
+             "https://i.imgur.com/BzbvfCf.gif",
+             "https://i.pinimg.com/originals/3c/31/c8/3c31c8503d9e31400e96d4b90b93c141.gif",
+             "https://i.pinimg.com/originals/b1/e7/84/b1e784b9edb0272216441fc1774d8ed4.gif",
+             "https://i0.wp.com/i.redd.it/y1ewvqjf3gt21.png",
+             "https://cdn.statically.io/img/nextshark.com/wp-content/uploads/2018/01/tumblr_ozth0ga3EL1qze3hdo1_r1_500.gif?quality=80&f=auto",
+             "https://cdn.discordapp.com/attachments/815851587615326228/874943404587511878/download.gif",
+             "https://i.pinimg.com/originals/34/d7/a3/34d7a3bbe7ab056f213e66c7182dd57e.gif",
+             "https://64.media.tumblr.com/29a8712aafa887fe4c8d32b726adb647/tumblr_osiz5xMRBW1vg9wr5o1_1280.gif",
+             "https://i.imgur.com/UmppnUD.gif"]
+    motivations = ["it'll be alright <3", "everything will be okay <3", "take a deep breath and relax <3", "you have nothing to worry about <3"]
+
+    em = discord.Embed(
+        title=motivations[random.randrange(0, len(motivations))],
+        description="",
+        color=discord.Color.blue())
+    em.set_image(url=links[random.randrange(0, len(links))])
+    await ctx.send(embed=em)
+
+@therapy.command()
+async def vent(ctx):
+    person = bot.get_user(ctx.author.id)
+    await person.send("Vent here, no one is listening!")
 
 @bot.group(invoke_without_command=True)
 async def help(ctx):
@@ -2362,6 +2480,7 @@ async def period(ctx):
     em.add_field(name="**Syntax**", value=".period [optional: next]")
     await ctx.send(embed=em)
 
+
 @help.command()
 async def hw(ctx):
     em = discord.Embed(title="HW",
@@ -2369,12 +2488,23 @@ async def hw(ctx):
     em.add_field(name="**Syntax**", value=".hw [optional: add/remove/clear]")
     await ctx.send(embed=em)
 
+
 @help.command()
 async def translate(ctx):
     em = discord.Embed(title="Translate", description="Translates one language into another")
-    em.add_field(name="**Syntax**", value=".translate [optional: codes] [language code to be translated into (ex. es) [words]")
-    em.add_field(name="**Common Language Codes**", value="Spanish - es \nFrench - fr\n Chinese - zh-CN \n English - en \nJapanese - ja \nArabic - ar \nRussian - ru")
+    em.add_field(name="**Syntax**",
+                 value=".translate [optional: codes] [language code to be translated into (ex. es) [words]")
+    em.add_field(name="**Common Language Codes**",
+                 value="Spanish - es \nFrench - fr\n Chinese - zh-CN \n English - en \nJapanese - ja \nArabic - ar \nRussian - ru")
     await ctx.send(embed=em)
+
+@help.command()
+async def therapy(ctx):
+    em = discord.Embed(title="Therapy", description="Personal therapy for irene")
+    em.add_field(name="**Syntax**",
+                 value=".therapy")
+    await ctx.send(embed=em)
+    
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
