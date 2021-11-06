@@ -155,21 +155,22 @@ periods = [
     "period 1", "period 2", "period 3", "period 4", "period 5", "period 6",
     "period 7"
 ]
-app = Flask('')
+
+#app = Flask('')
 
 
-@app.route('/')
-def main():
-    return "Your Bot Is Ready"
+#@app.route('/')
+#def main():
+    #return "Your Bot Is Ready"
 
 
-def run():
-    app.run(host="0.0.0.0", port=8000)
+#def run():
+    #app.run(host="0.0.0.0", port=8000)
 
 
-def keep_alive():
-    server = Thread(target=run)
-    server.start()
+#def keep_alive():
+    #server = Thread(target=run)
+    #server.start()
 
 
 status = cycle([
@@ -407,22 +408,9 @@ async def addrole(ctx, arg):
 
 @bot.command()
 async def basta(ctx):
-    channel = bot.get_channel(772817612693307424)
     random_number = random.randint(1, 7)
-    if random_number == 1:
-        await channel.send(file=discord.File('.//pics//Basta1.png'))
-    if random_number == 2:
-        await channel.send(file=discord.File('.//pics//Basta2.png'))
-    if random_number == 3:
-        await channel.send(file=discord.File('.//pics//Basta3.png'))
-    if random_number == 4:
-        await channel.send(file=discord.File('.//pics//Basta4.png'))
-    if random_number == 5:
-        await channel.send(file=discord.File('.//pics//Basta5.png'))
-    if random_number == 6:
-        await channel.send(file=discord.File('.//pics//Basta6.png'))
-    if random_number == 7:
-        await channel.send(file=discord.File('.//pics//Basta7.png'))
+    image = f".//pics//Basta{random_number}.png"
+    await ctx.send(file=discord.File(image))
 
 
 @bot.command()
@@ -2529,3 +2517,7 @@ async def weather(ctx):
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
+t)
+t)
+t)
+t)
