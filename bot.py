@@ -8,9 +8,6 @@ from discord.ext import commands, tasks
 import datetime
 from discord.utils import get
 from itertools import cycle
-from flask import Flask
-from threading import Thread
-import PIL
 from PIL import Image, ImageFont, ImageDraw
 import gspread
 from selenium import webdriver
@@ -24,7 +21,6 @@ import urllib.parse
 import urllib.request
 from googletrans import Translator, constants
 import python_weather
-from pprint import pprint
 
 os.system('pip install googletrans==3.1.0a0')
 
@@ -155,22 +151,6 @@ periods = [
     "period 1", "period 2", "period 3", "period 4", "period 5", "period 6",
     "period 7"
 ]
-
-#app = Flask('')
-
-
-#@app.route('/')
-#def main():
-    #return "Your Bot Is Ready"
-
-
-#def run():
-    #app.run(host="0.0.0.0", port=8000)
-
-
-#def keep_alive():
-    #server = Thread(target=run)
-    #server.start()
 
 
 status = cycle([
@@ -462,12 +442,20 @@ async def setname(ctx, *, arg):
         await channel.purge(limit=10)
         em = discord.Embed(
             title="Name List",
-            description="List of IRL Names for students on the NSBORO Server.",
+            description="```List of IRL Names for students on the NSBORO Server.```",
             color=discord.Color.orange())
-        em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
-        em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
-        em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
-        em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
+        em2 = discord.Embed(title="Name List Part 2",
+                            description="```Part 2 of list of IRL Names for students on the NSBORO Server.```",
+                            color=discord.Color.orange())
+        em3 = discord.Embed(title="Name List Part 3",
+                            description="```Part 3 of list of IRL Names for students on the NSBORO Server.```",
+                            color=discord.Color.orange())
+        em4 = discord.Embed(title="Name List Part 4",
+                            description="```Part 4 of list of IRL Names for students on the NSBORO Server.```",
+                            color=discord.Color.orange())
+        em5 = discord.Embed(title="Name List Part 5",
+                            description="```Part 5 of list of IRL Names for students on the NSBORO Server.```",
+                            color=discord.Color.orange())
 
         counter = 1
 
@@ -532,12 +520,20 @@ async def changename(ctx, user: discord.User, *, arg):
             await channel.purge(limit=10)
             em = discord.Embed(
                 title="Name List",
-                description="List of IRL Names for students on the NSBORO Server.",
+                description="```List of IRL Names for students on the NSBORO Server.```",
                 color=discord.Color.orange())
-            em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
-            em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
-            em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
-            em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
+            em2 = discord.Embed(title="Name List Part 2",
+                                description="```Part 2 of list of IRL Names for students on the NSBORO Server.```",
+                                color=discord.Color.orange())
+            em3 = discord.Embed(title="Name List Part 3",
+                                description="```Part 3 of list of IRL Names for students on the NSBORO Server.```",
+                                color=discord.Color.orange())
+            em4 = discord.Embed(title="Name List Part 4",
+                                description="```Part 4 of list of IRL Names for students on the NSBORO Server.```",
+                                color=discord.Color.orange())
+            em5 = discord.Embed(title="Name List Part 5",
+                                description="```Part 5 of list of IRL Names for students on the NSBORO Server.```",
+                                color=discord.Color.orange())
 
             counter = 1
 
@@ -570,12 +566,12 @@ async def namelist(ctx):
     list_names = sorted(list_names, key=lambda x: x[1].lower())
     em = discord.Embed(
         title="Name List",
-        description="List of IRL Names for students on the NSBORO Server.",
+        description="```List of IRL Names for students on the NSBORO Server.```",
         color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
+    em2 = discord.Embed(title="Name List Part 2", description="```Part 2 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
+    em3 = discord.Embed(title="Name List Part 3", description="```Part 3 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
+    em4 = discord.Embed(title="Name List Part 4", description="```Part 4 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
+    em5 = discord.Embed(title="Name List Part 5", description="```Part 5 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
 
     counter = 1
     for x in list_names:
@@ -1007,7 +1003,7 @@ async def slots(ctx, arg):
 
 @bot.command()
 async def shop(ctx):
-    em = discord.Embed(title="NSBORO Discord Bot Shop")
+    em = discord.Embed(title="NSBORO Discord Bot Shop", description="```All items you can buy from the shop```")
 
     for item in mainshop:
         name = item["name"]
@@ -1083,7 +1079,7 @@ async def sell(ctx, item, amount=1):
                     new_amt = old_amt - amount
                     if new_amt < 0:
                         await ctx.send(
-                            "Noob you cannot sell more than you have")
+                            "You cannot sell more than you have")
                         break
                     users[str(user.id)]["bag"][index]["amount"] = new_amt
                     users[str(user.id)]["bank"] += cost
@@ -1107,7 +1103,7 @@ async def bag(ctx, member: discord.Member = None):
         em = discord.Embed(
             title=f"{ctx.author}'s Bag",
             description=
-            "Your bag contains items you buy from the NSBORO bot shop")
+            "```Your bag contains items you buy from the NSBORO bot shop```")
         for item in bag:
             name = item["item"]
             amount = item["amount"]
@@ -1744,22 +1740,22 @@ async def translate(ctx, toLang, *, args):
 async def codes(ctx):
     em = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 1",
-        description="Language Codes for Supported Languages",
+        description="```Language Codes for Supported Languages```",
         color=0xe91e63
     )
     em2 = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 2",
-        description="Language Codes for Supported Languages",
+        description="```Language Codes for Supported Languages```",
         color=0xe91e63
     )
     em3 = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 3",
-        description="Language Codes for Supported Languages",
+        description="```Language Codes for Supported Languages```",
         color=0xe91e63
     )
     em4 = discord.Embed(
         title="NSBORO Bot Translater Language Codes Pt. 4",
-        description="Language Codes for Supported Languages",
+        description="```Language Codes for Supported Languages```",
         color=0xe91e63
     )
 
@@ -2015,6 +2011,7 @@ async def help(ctx):
         "bal, beg, pray, give, rob, lottery, slots, shop, buy, sell, use, stock"
     )
     em.add_field(name="Miscellaneous", value="fight, kill, basta, kyt")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2023,9 +2020,10 @@ async def color(ctx):
     em = discord.Embed(
         title="Color",
         description=
-        "Gives [HEX Code] as a color role. Please do not include the # in the Hex Code when running the command. Before changing roles to another color, please include \"remove\" in [arg], else leave it blank."
+        "```Gives [HEX Code] as a color role. Please do not include the # in the Hex Code when running the command. Before changing roles to another color, please include \"remove\" in [arg], else leave it blank.```"
     )
     em.add_field(name="**Syntax**", value=".color [HEX Code] [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2033,22 +2031,24 @@ async def color(ctx):
 async def stats(ctx):
     em = discord.Embed(
         title="Stats",
-        description="Returns the number of users on the NSBORO Server")
+        description="```Returns the number of users on the NSBORO Server```")
     em.add_field(name="**Syntax**", value=".stats")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def ping(ctx):
-    em = discord.Embed(title="Ping", description="Returns latency")
+    em = discord.Embed(title="Ping", description="```Returns latency```")
     em.add_field(name="**Syntax**", value=".ping")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def rules(ctx):
     em = discord.Embed(title="Rules",
-                       description="Returns NSBORO server rules")
+                       description="```Returns NSBORO server rules```")
     em.add_field(name="**Syntax**", value=".rules")
     await ctx.send(embed=em)
 
@@ -2058,17 +2058,19 @@ async def studymode(ctx):
     em = discord.Embed(
         title="Studymode",
         description=
-        "Turns studymode [on/off]]. Studymode will remind you to keep working on your work, so whenever you send a message onto the NSBORO server, the NSBORO bot will remind you to keep working"
+        "```Turns studymode [on/off]]. Studymode will remind you to keep working on your work, so whenever you send a message onto the NSBORO server, the NSBORO bot will remind you to keep working```"
     )
     em.add_field(name="**Syntax**", value=".studymode [on/off]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def invite(ctx):
     em = discord.Embed(title="Invite",
-                       description="Returns the NSBORO server invite")
+                       description="```Returns the NSBORO server invite```")
     em.add_field(name="**Syntax**", value=".invite")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2076,8 +2078,9 @@ async def invite(ctx):
 async def report(ctx):
     em = discord.Embed(
         title="Report",
-        description="Reports [arg]] to the Moderators and Admins")
+        description="```Reports [arg]] to the Moderators and Admins```")
     em.add_field(name="**Syntax**", value=".report [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2085,8 +2088,9 @@ async def report(ctx):
 async def mute(ctx):
     em = discord.Embed(
         title="Mute",
-        description="Any Mods/Admins can use this command to mute [user]")
+        description="```Any Mods/Admins can use this command to mute [user]```")
     em.add_field(name="**Syntax**", value=".mute [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2094,8 +2098,9 @@ async def mute(ctx):
 async def unmute(ctx):
     em = discord.Embed(
         title="Unmute",
-        description="Any Mods/Admins can use this command to unmute [user]")
+        description="```Any Mods/Admins can use this command to unmute [user]```")
     em.add_field(name="**Syntax**", value=".unmute [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2103,8 +2108,9 @@ async def unmute(ctx):
 async def warn(ctx):
     em = discord.Embed(
         title="Warn",
-        description="Any Mods/Admins can use this command to warn [user]")
+        description="```Any Mods/Admins can use this command to warn [user]```")
     em.add_field(name="**Syntax**", value=".warn [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2113,9 +2119,10 @@ async def purge(ctx):
     em = discord.Embed(
         title="Purge",
         description=
-        "Any Mods/Admins can use this command to clear [arg] number of messages in that channel"
+        "```Any Mods/Admins can use this command to clear [arg] number of messages in that channel```"
     )
     em.add_field(name="**Syntax**", value=".purge [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2124,9 +2131,10 @@ async def tempmute(ctx):
     em = discord.Embed(
         title="Tempmute",
         description=
-        "Any Mods/Admins can use this command to tempmute [user] for [arg] seconds"
+        "```Any Mods/Admins can use this command to tempmute [user] for [arg] seconds```"
     )
     em.add_field(name="**Syntax**", value=".tempmute [user] [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2134,8 +2142,9 @@ async def tempmute(ctx):
 async def kick(ctx):
     em = discord.Embed(
         title="Kick",
-        description="Any Admins can use this command to kick [user]")
+        description="```Any Admins can use this command to kick [user]```")
     em.add_field(name="**Syntax**", value=".kick [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2143,8 +2152,9 @@ async def kick(ctx):
 async def ban(ctx):
     em = discord.Embed(
         title="Ban",
-        description="Any Admins can use this command to ban [user]")
+        description="```Any Admins can use this command to ban [user]```")
     em.add_field(name="**Syntax**", value=".ban [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2152,8 +2162,9 @@ async def ban(ctx):
 async def unban(ctx):
     em = discord.Embed(
         title="Ban",
-        description="Any Admins can use this command to unban [user]")
+        description="```Any Admins can use this command to unban [user]```")
     em.add_field(name="**Syntax**", value=".unban [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2162,8 +2173,9 @@ async def giverole(ctx):
     em = discord.Embed(
         title="Giverole",
         description=
-        "Any Mods/Admin can use this command to give [role] to [user]")
+        "```Any Mods/Admin can use this command to give [role] to [user]```")
     em.add_field(name="**Syntax**", value=".giverole [user] [role]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2172,8 +2184,9 @@ async def removerole(ctx):
     em = discord.Embed(
         title="Removerole",
         description=
-        "Any Mods/Admin can use this command to remove [role] from [user]")
+        "```Any Mods/Admin can use this command to remove [role] from [user]```")
     em.add_field(name="**Syntax**", value=".removerole [user] [role]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2182,8 +2195,9 @@ async def addrole(ctx):
     em = discord.Embed(
         title="Addrole",
         description=
-        "Any Mods/Admin can use this command to add [arg] role to the server")
+        "```Any Mods/Admin can use this command to add [arg] role to the server```")
     em.add_field(name="**Syntax**", value=".addrole [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2192,9 +2206,10 @@ async def slowmode(ctx):
     em = discord.Embed(
         title="Slowmode",
         description=
-        "Any Mods/Admin can use this command to set [arg] second slowmode to the channel"
+        "```Any Mods/Admin can use this command to set [arg] second slowmode to the channel```"
     )
     em.add_field(name="**Syntax**", value=".slowmode [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2203,9 +2218,10 @@ async def bal(ctx):
     em = discord.Embed(
         title="Bal",
         description=
-        "You can use this to check the balance of [user]. If [user] is left empty, then it is defauled to check your own balance"
+        "```You can use this to check the balance of [user]. If [user] is left empty, then it is defauled to check your own balance```"
     )
     em.add_field(name="**Syntax**", value=".bal [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2213,16 +2229,18 @@ async def bal(ctx):
 async def beg(ctx):
     em = discord.Embed(
         title="Beg",
-        description="Beg for coins, where the currency is stored in your bank")
+        description="```Beg for coins, where the currency is stored in your bank```")
     em.add_field(name="**Syntax**", value=".beg")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def pray(ctx):
     em = discord.Embed(title="Pray",
-                       description="Pray to either basta or steven for coins")
+                       description="```Pray to either basta or steven for coins```")
     em.add_field(name="**Syntax**", value=".pray [basta/steven]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2231,17 +2249,19 @@ async def lottery(ctx):
     em = discord.Embed(
         title="Lottery",
         description=
-        "Enter the lottery with [arg] coins, you have a 1/10 chance of winning 100x the amount entered"
+        "```Enter the lottery with [arg] coins, you have a 1/10 chance of winning 100x the amount entered```"
     )
     em.add_field(name="**Syntax**", value=".lottery [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def give(ctx):
     em = discord.Embed(title="Give",
-                       description="You can give [arg] coins to [user]")
+                       description="```You can give [arg] coins to [user]```")
     em.add_field(name="**Syntax**", value=".give [user] [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2250,9 +2270,10 @@ async def rob(ctx):
     em = discord.Embed(
         title="Rob",
         description=
-        "You attempt to rob [user]. If successful, you will take a part of their money. If you fail, you must pay them money."
+        "```You attempt to rob [user]. If successful, you will take a part of their money. If you fail, you must pay them money.```"
     )
     em.add_field(name="**Syntax**", value=".rob [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2261,9 +2282,10 @@ async def slots(ctx):
     em = discord.Embed(
         title="Slots",
         description=
-        "Bet [arg] coins in a game of slots! Same 2 slots will reward you 3x the amount entered. Same 3 slots will reward you 5x the amount entered."
+        "```Bet [arg] coins in a game of slots! Same 2 slots will reward you 3x the amount entered. Same 3 slots will reward you 5x the amount entered.```"
     )
     em.add_field(name="**Syntax**", value=".slots [arg]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2272,9 +2294,10 @@ async def shop(ctx):
     em = discord.Embed(
         title="Shop",
         description=
-        "It will open the NSBORO bot shop where you can buy miscellaneous items with your coins"
+        "```It will open the NSBORO bot shop where you can buy miscellaneous items with your coins```"
     )
     em.add_field(name="**Syntax**", value=".shop")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2282,8 +2305,9 @@ async def shop(ctx):
 async def bag(ctx):
     em = discord.Embed(
         title="Bag",
-        description="It will open your inventory containing items you bought")
+        description="```It will open your inventory containing items you bought```")
     em.add_field(name="**Syntax**", value=".bag")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2292,9 +2316,10 @@ async def buy(ctx):
     em = discord.Embed(
         title="Buy",
         description=
-        "Buys [qty] [item]s from the shop with your coins. Leaving [qty] blank will default the amount to one"
+        "```Buys [qty] [item]s from the shop with your coins. Leaving [qty] blank will default the amount to one```"
     )
     em.add_field(name="**Syntax**", value=".buy [item] [qty]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2303,9 +2328,10 @@ async def sell(ctx):
     em = discord.Embed(
         title="Shop",
         description=
-        "Sells [qty] [item]s from your bag with your coins. Leaving [qty] blank will default the amount to one"
+        "```Sells [qty] [item]s from your bag with your coins. Leaving [qty] blank will default the amount to one```"
     )
     em.add_field(name="**Syntax**", value=".sell [item] [qty]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2314,30 +2340,34 @@ async def use(ctx):
     em = discord.Embed(
         title="Shop",
         description=
-        "Uses 1 [item] from your bag. Various items will do various things.")
+        "```Uses 1 [item] from your bag. Various items will do various things.```")
     em.add_field(name="**Syntax**", value=".use [item]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def fight(ctx):
-    em = discord.Embed(title="Fight", description="Fights [user]")
+    em = discord.Embed(title="Fight", description="```Fights [user]```")
     em.add_field(name="**Syntax**", value=".fight [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def kill(ctx):
-    em = discord.Embed(title="Kill", description="Kills [user]")
+    em = discord.Embed(title="Kill", description="```Kills [user]```")
     em.add_field(name="**Syntax**", value=".kill [user]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def basta(ctx):
     em = discord.Embed(title="Basta",
-                       description="Returns a random image of Basta god")
+                       description="```Returns a random image of Basta god```")
     em.add_field(name="**Syntax**", value=".basta")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2345,8 +2375,9 @@ async def basta(ctx):
 async def kyt(ctx):
     em = discord.Embed(
         title="KYT",
-        description="Send President Kevin Yao your prayers and thanks")
+        description="```Send President Kevin Yao your prayers and thanks```")
     em.add_field(name="**Syntax**", value=".kyt")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2354,24 +2385,27 @@ async def kyt(ctx):
 async def stock(ctx):
     em = discord.Embed(
         title="Stock",
-        description="Returns the current price of the NSBORO bot stock")
+        description="```Returns the current price of the NSBORO bot stock```")
     em.add_field(name="**Syntax**", value=".stock")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def setname(ctx):
     em = discord.Embed(title="Setname",
-                       description="Sets your IRL name using this command")
+                       description="```Sets your IRL name using this command```")
     em.add_field(name="**Syntax**", value=".setname [FirstName LastName]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def getname(ctx):
     em = discord.Embed(title="Getname",
-                       description="Gets the mentioned user's IRL name")
+                       description="```Gets the mentioned user's IRL name```")
     em.add_field(name="**Syntax**", value=".getname @user")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2379,9 +2413,10 @@ async def getname(ctx):
 async def changename(ctx):
     em = discord.Embed(
         title="Changename",
-        description="Changes the mentioned user's IRL name (for Staff only)")
+        description="```Changes the mentioned user's IRL name (for Staff only)```")
     em.add_field(name="**Syntax**",
                  value=".changename @user [FirstName LastName]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2390,13 +2425,14 @@ async def schedule(ctx):
     em = discord.Embed(
         title="Schedule",
         description=
-        "Creates a schedule (School Year 2021-2022). Keep each class name to one word without spaces. Once initially created, you can update your schedule with the same command, or you can .viewschedule to get your schedule"
+        "```Creates a schedule (School Year 2021-2022). Keep each class name to one word without spaces. Once initially created, you can update your schedule with the same command, or you can .viewschedule to get your schedule```"
     )
     em.add_field(
         name="**Syntax**",
         value=
         ".schedule [first_class] [second_class] [third_class] [fourth_class] [fifth class] [sixth class] [seventh class] **NO SPACES IN CLASS NAMES**"
     )
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2404,8 +2440,9 @@ async def schedule(ctx):
 async def covid(ctx):
     em = discord.Embed(
         title="Covid",
-        description="Sends the weekly COVID-19 data of NSBORO schools.")
+        description="```Sends the weekly COVID-19 data of NSBORO schools.```")
     em.add_field(name="**Syntax**", value=".covid")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2413,8 +2450,9 @@ async def covid(ctx):
 async def viewschedule(ctx):
     em = discord.Embed(
         title="Viewschedule",
-        description="Sends your or another person's saved schedule.")
+        description="```Sends your or another person's saved schedule.```")
     em.add_field(name="**Syntax**", value=".viewschedule [optional: @person]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
@@ -2422,49 +2460,55 @@ async def viewschedule(ctx):
 async def getclass(ctx):
     em = discord.Embed(
         title="Getclass",
-        description="Gets you or another person's current or next class")
+        description="```Gets you or another person's current or next class```")
     em.add_field(name="**Syntax**",
                  value=".getclass [optional: next] [optional: @person]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def period(ctx):
     em = discord.Embed(title="Period",
-                       description="Sends the current or next period number")
+                       description="```Sends the current or next period number```")
     em.add_field(name="**Syntax**", value=".period [optional: next]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def hw(ctx):
     em = discord.Embed(title="HW",
-                       description="Sends a list of all homework/tasks. Can be updated with .hw add/remove/clear")
+                       description="```Sends a list of all homework/tasks. Can be updated with .hw add/remove/clear```")
     em.add_field(name="**Syntax**", value=".hw [optional: add/remove/clear]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 
 @help.command()
 async def translate(ctx):
-    em = discord.Embed(title="Translate", description="Translates one language into another")
+    em = discord.Embed(title="Translate", description="```Translates one language into another```")
     em.add_field(name="**Syntax**",
                  value=".translate [optional: codes] [language code to be translated into (ex. es) [words]")
     em.add_field(name="**Common Language Codes**",
                  value="Spanish - es \nFrench - fr\n Chinese - zh-CN \n English - en \nJapanese - ja \nArabic - ar \nRussian - ru")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 @help.command()
 async def therapy(ctx):
-    em = discord.Embed(title="Therapy", description="Personal therapy for irene")
+    em = discord.Embed(title="Therapy", description="```Personal therapy for irene```")
     em.add_field(name="**Syntax**",
                  value=".therapy")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 @help.command()
 async def weather(ctx):
-    em = discord.Embed(title="Weather", description="Sends the weather")
+    em = discord.Embed(title="Weather", description="```Sends the weather```")
     em.add_field(name="**Syntax**",
                  value=".weather [place]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
 my_secret = os.environ['serverkey']
