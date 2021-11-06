@@ -231,9 +231,6 @@ async def on_message(message):
         emoji_2 = '<:emoji_25:699610131784269885>'
         await message.add_reaction(emoji)
         await message.add_reaction(emoji_2)
-    if message.channel.id == 772817612693307424:
-        emoji = '<:basta:722590619683258479>'
-        await message.add_reaction(emoji)
 
     bad_words = [
         "nigger", "nigga", "slut", "scum", "cunt", "whore", "retard",
@@ -250,10 +247,6 @@ async def on_message(message):
         "loplkc#7489"
     ]
 
-    if message.author.id == 535314077329784854:
-        channel = await message.author.id.create_dm()
-        await channel.send("stfu kevin")
-
     user = message.author
     role = discord.utils.get(user.roles, name="studymode")
     if message.content.find(".studymode off") != -1:
@@ -262,6 +255,8 @@ async def on_message(message):
         channel = await user.create_dm()
         await channel.send(
             f"""Noob go do your work \".studymode off\" to turn this off""")
+        await message.channel.purge(limit=1)
+        await message.channel.send("do your hw")
 
     await bot.process_commands(message)
 
@@ -270,7 +265,7 @@ async def on_message(message):
 async def on_member_leave(member):
     channel = await member.create_dm()
     await channel.send(
-        "Sorry to see you go, we will *definitely* miss you from the NSBORO Server"
+        "Sorry to see you go"
     )
     await member.channel.send(
         f"""{member.nick} betrayed the NSBORO Discord Server since they simped too hard"""
@@ -279,18 +274,7 @@ async def on_member_leave(member):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.channel.send(f"pong. '{round(bot.latency * 1000)}ms")
-
-
-@bot.command(pass_context=True)
-async def join(ctx):
-    if (ctx.author.voice):
-        channel = ctx.author.voice.channel
-        await channel.connect()
-    else:
-        await ctx.send(
-            "You are not in a voice channel, you must be in a voice channel to run this command"
-        )
+    await ctx.send(f"pong. '{round(bot.latency * 1000)}ms")
 
 
 @bot.command()
@@ -311,7 +295,7 @@ async def rules(ctx):
 @commands.has_role('Staff')
 async def mute(ctx, member: discord.Member):
     role = discord.utils.get(ctx.guild.roles, name='Muted')
-    await ctx.channel.send(f"""{member.nick} has been muted""")
+    await ctx.send(f"""{member.nick} has been muted""")
     await member.add_roles(role)
 
 
@@ -319,7 +303,7 @@ async def mute(ctx, member: discord.Member):
 @commands.has_role('Staff')
 async def unmute(ctx, member: discord.Member):
     role = discord.utils.get(ctx.guild.roles, name='Muted')
-    await ctx.channel.send(f"""{member.nick} has been unmuted""")
+    await ctx.send(f"""{member.nick} has been unmuted""")
     await member.remove_roles(role)
 
 
@@ -336,8 +320,8 @@ async def purge(ctx, limit: int):
 @bot.command()
 @commands.has_role('Staff')
 async def warn(ctx, member: discord.Member):
-    await ctx.channel.send(
-        f"""{member.nick} has been warned. be aware of the big mute""")
+    await ctx.send(
+        f"""{member.nick} has been warned. be aware of the mute""")
 
 
 @bot.command()
@@ -345,7 +329,7 @@ async def warn(ctx, member: discord.Member):
 async def tempmute(ctx, member: discord.Member, mute_time: int):
     role = discord.utils.get(ctx.guild.roles, name="Muted")
     await member.add_roles(role)
-    await ctx.channel.send(
+    await ctx.send(
         f"""{member.nick} has been temporarily muted for {mute_time} seconds"""
     )
     await asyncio.sleep(mute_time)
@@ -441,40 +425,42 @@ async def setname(ctx, *, arg):
     await ctx.send(f"Your name has sucessfully been set to {name}")
 
     # sending namelist in member channel
-    channel = bot.get_channel(789896145781391370)
-    await channel.purge(limit=10)
+    if bot.get_channel(789896145781391370) == None:
+        pass
+    else:
+        channel = bot.get_channel(789896145781391370)
+        await channel.purge(limit=10)
+        em = discord.Embed(
+            title="Name List",
+            description="List of IRL Names for students on the NSBORO Server.",
+            color=discord.Color.orange())
+        em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
+        em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
+        em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
+        em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
 
-    em = discord.Embed(
-        title="Name List",
-        description="List of IRL Names for students on the NSBORO Server.",
-        color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
+        counter = 1
 
-    counter = 1
+        for x in list_names:
+            user = bot.get_user(int(x[0]))
+            if user == None: continue
+            if counter <= 25:
+                em.add_field(name=f"{user}", value=x[1])
+            elif counter > 25 and counter <= 50:
+                em2.add_field(name=f"{user}", value=x[1])
+            elif counter > 50 and counter <= 75:
+                em3.add_field(name=f"{user}", value=x[1])
+            elif counter > 75 and counter <= 100:
+                em4.add_field(name=f"{user}", value=x[1])
+            elif counter > 100 <= 125:
+                em5.add_field(name=f"{user}", value=x[1])
+            counter += 1
 
-    for x in list_names:
-        user = bot.get_user(int(x[0]))
-        if user == None: continue
-        if counter <= 25:
-            em.add_field(name=f"{user}", value=x[1])
-        elif counter > 25 and counter <= 50:
-            em2.add_field(name=f"{user}", value=x[1])
-        elif counter > 50 and counter <= 75:
-            em3.add_field(name=f"{user}", value=x[1])
-        elif counter > 75 and counter <= 100:
-            em4.add_field(name=f"{user}", value=x[1])
-        elif counter > 100 <= 125:
-            em5.add_field(name=f"{user}", value=x[1])
-        counter += 1
-
-    await channel.send(embed=em)
-    await channel.send(embed=em2)
-    await channel.send(embed=em3)
-    await channel.send(embed=em4)
-    await channel.send(embed=em5)
+        await channel.send(embed=em)
+        await channel.send(embed=em2)
+        await channel.send(embed=em3)
+        await channel.send(embed=em4)
+        await channel.send(embed=em5)
 
 
 @bot.command()
@@ -508,40 +494,43 @@ async def changename(ctx, user: discord.User, *, arg):
         worksheet.update(f'A1:B{len(list_names)}', list_names)
         await ctx.send(f"{user.name} IRL name has been set to {arg}")
 
-    # sending namelist in member channel
-    channel = bot.get_channel(789896145781391370)
-    await channel.purge(limit=10)
+        # sending namelist in member channel
+        if bot.get_channel(789896145781391370) == None:
+            pass
+        else:
+            channel = bot.get_channel(789896145781391370)
+            await channel.purge(limit=10)
+            em = discord.Embed(
+                title="Name List",
+                description="List of IRL Names for students on the NSBORO Server.",
+                color=discord.Color.orange())
+            em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
+            em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
+            em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
+            em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
 
-    em = discord.Embed(
-        title="Name List",
-        description="List of IRL Names for students on the NSBORO Server.",
-        color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2", color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3", color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4", color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5", color=discord.Color.orange())
+            counter = 1
 
-    counter = 1
-    for x in list_names:
-        user = bot.get_user(int(x[0]))
-        if user == None: continue
-        if counter <= 25:
-            em.add_field(name=f"{user}", value=x[1])
-        elif counter > 25 and counter <= 50:
-            em2.add_field(name=f"{user}", value=x[1])
-        elif counter > 50 and counter <= 75:
-            em3.add_field(name=f"{user}", value=x[1])
-        elif counter > 75 and counter <= 100:
-            em4.add_field(name=f"{user}", value=x[1])
-        elif counter > 100 <= 125:
-            em5.add_field(name=f"{user}", value=x[1])
-        counter += 1
+            for x in list_names:
+                user = bot.get_user(int(x[0]))
+                if user == None: continue
+                if counter <= 25:
+                    em.add_field(name=f"{user}", value=x[1])
+                elif counter > 25 and counter <= 50:
+                    em2.add_field(name=f"{user}", value=x[1])
+                elif counter > 50 and counter <= 75:
+                    em3.add_field(name=f"{user}", value=x[1])
+                elif counter > 75 and counter <= 100:
+                    em4.add_field(name=f"{user}", value=x[1])
+                elif counter > 100 <= 125:
+                    em5.add_field(name=f"{user}", value=x[1])
+                counter += 1
 
-    await channel.send(embed=em)
-    await channel.send(embed=em2)
-    await channel.send(embed=em3)
-    await channel.send(embed=em4)
-    await channel.send(embed=em5)
+            await channel.send(embed=em)
+            await channel.send(embed=em2)
+            await channel.send(embed=em3)
+            await channel.send(embed=em4)
+            await channel.send(embed=em5)
 
 
 @bot.command()
@@ -614,7 +603,9 @@ async def setUID(ctx, arg):
 
 @bot.command()
 async def stats(ctx):
-    await ctx.send(f"""NSBORO Discord Server Stats: \n 85 students""")
+    member_count = len(ctx.guild.members)  # includes bots
+    true_member_count = len([m for m in ctx.guild.members if not m.bot])  # doesn't include bots
+    await ctx.send(f"""NSBORO Discord Server Stats: \n {true_member_count} students""")
 
 
 @bot.command()
@@ -623,7 +614,7 @@ async def studymode(ctx, arg):
         user = ctx.message.author
         role = discord.utils.get(ctx.guild.roles, name="studymode")
         if role in ctx.author.roles:
-            await ctx.send("cringe you are already on studymode")
+            await ctx.send("You are already on studymode")
         else:
             await user.add_roles(role)
             await ctx.send(f"""studymode is turned on for {user.mention}""")
@@ -634,7 +625,7 @@ async def studymode(ctx, arg):
             await user.remove_roles(role)
             await ctx.send(f"""studymode is turned off for {user.mention}""")
         else:
-            await ctx.send("cringe you are already not on studymode")
+            await ctx.send("You are not on studymode")
     else:
         await ctx.send(
             "The studymode commands accepts arguments **[on]/[off]**")
@@ -677,9 +668,12 @@ async def invite(ctx):
 
 @bot.command()
 async def report(ctx, *, arg):
-    channel = bot.get_channel(771888680083652628)
-    author = ctx.message.author
-    await channel.send(f"""{author.name} reported {arg}""")
+    if bot.get_channel(771888680083652628) == None:
+        return
+    else:
+        channel = bot.get_channel(771888680083652628)
+        author = ctx.message.author
+        await channel.send(f"""{author.name} reported {arg}""")
     user = bot.get_user(530569044185579521)
     await user.send(f"""{author.name} reported {arg}""")
 
@@ -688,8 +682,7 @@ async def report(ctx, *, arg):
 @commands.has_role('Staff')
 async def slowmode(ctx, seconds: int):
     await ctx.channel.edit(slowmode_delay=seconds)
-    await ctx.send(
-        f"""Set the slowmode delay in this channel to {seconds} seconds!""")
+    await ctx.send(f"""Set the slowmode delay in this channel to {seconds} seconds!""")
 
 
 @bot.command()
@@ -831,84 +824,44 @@ async def rob(ctx, member: discord.Member):
 
 @bot.command()
 async def fight(ctx, member: discord.Member):
-    random_number = random.randint(1, 9)
-    user = ctx.author
-    if random_number == 1:
-        await ctx.send(f"{ctx.author} beat {member} into pulp")
-    elif random_number == 2:
-        await ctx.send(
-            f"{ctx.author} used Self Destruct! It was not very effective...")
-    elif random_number == 3:
-        await ctx.send(f"{ctx.author} was too much for {member}")
-    elif random_number == 4:
-        await ctx.send(f"{member} was ended by {ctx.author}")
-    elif random_number == 5:
-        await ctx.send(f"{member} was mauled by {user}'s hydroflask")
-    elif random_number == 6:
-        await ctx.send(f"{user}'s mixtape was too fire for {member}")
-    elif random_number == 7:
-        await ctx.send(
-            f"{user} vaporized {member} using their unlimited stupidity")
-    elif random_number == 8:
-        await ctx.send(f"{member} fainted due to {user}'s lack of braincells")
-    elif random_number == 9:
-        await ctx.send(f"{member} was betrayed by {user}")
+    statements = [f"{ctx.author} beat {member} into pulp", 
+                  f"{ctx.author} used Self Destruct! It was not very effective...",
+                  f"{ctx.author} was too much for {member}",
+                  f"{member} was ended by {ctx.author}",
+                  f"{member} was mauled by {ctx.author}'s hydroflask",
+                  f"{ctx.author}'s mixtape was too fire for {member}",
+                  f"{ctx.author} vaporized {member} using their unlimited stupidity",
+                  f"{member} fainted due to {ctx.author}'s lack of braincells",
+                  f"{member} was betrayed by {ctx.author}"
+                  ]
+    await ctx.send(statements[random.randint(0, 8)])
 
 
 @bot.command()
 async def kill(ctx, member: discord.Member):
-    randomnum = random.randint(1, 20)
-    if randomnum == 1:
-        await ctx.send(f"{ctx.author} obliterated {member} in fortnite")
-    elif randomnum == 2:
-        await ctx.send(f"{ctx.author} juiced the insides of {member} out")
-    elif randomnum == 3:
-        await ctx.send(
-            f"{ctx.author} rhone moaned {member} while trying to throb")
-    elif randomnum == 4:
-        await ctx.send(f"{ctx.author} succed {member}'s ducc")
-    elif randomnum == 5:
-        await ctx.send(
-            f"{ctx.author} let dan absolutely destroy {member}'s ducc")
-    elif randomnum == 6:
-        await ctx.send(f"{member} was smited by God")
-    elif randomnum == 7:
-        await ctx.send(f"{member} was eviscerated by a tree")
-    elif randomnum == 8:
-        await ctx.send(f"{member} was pricked to death")
-    elif randomnum == 9:
-        await ctx.send(f"{member} stared at the Sun for too long")
-    elif randomnum == 10:
-        await ctx.send(
-            f"{ctx.author} was stabbed in the chest, but took it out and killed {member}"
-        )
-    elif randomnum == 11:
-        await ctx.send(
-            f"{member} thinks about suicide, however, they call 800-273-8255 and get help from a professional"
-        )
-    elif randomnum == 12:
-        await ctx.send(
-            f"{member} was slaughtered by hungry puppies in a bucket.")
-    elif randomnum == 13:
-        await ctx.send(f"{member} listened to death metal at max volume")
-    elif randomnum == 14:
-        await ctx.send(
-            f"{member} was assassinated while on a date with {ctx.author}")
-    elif randomnum == 15:
-        await ctx.send(
-            f"{member} tried to defuse a bomb. It wasn't the red wire")
-    elif randomnum == 16:
-        await ctx.send(f"{member} challenged Goku to a duel")
-    elif randomnum == 17:
-        await ctx.send(f"{member} was Haydened")
-    elif randomnum == 18:
-        await ctx.send(
-            f"{ctx.author} figured out what the liquefy tool in Photoshop was. {member} was their first test subject"
-        )
-    elif randomnum == 19:
-        await ctx.send(f"{ctx.author} used {member} as a shield in a gunfight")
-    elif randomnum == 20:
-        await ctx.send(f"{member} went on https://reddit.com/r/rule34fallguys")
+    statements = [
+        f"{ctx.author} obliterated {member} in fortnite",
+        f"{ctx.author} juiced the insides of {member} out",
+        f"{ctx.author} rhone moaned {member} while trying to throb",
+        f"{ctx.author} succed {member}'s ducc",
+        f"{ctx.author} let dan absolutely destroy {member}'s ducc",
+        f"{member} was smited by God",
+        f"{member} was eviscerated by a tree",
+        f"{member} was pricked to death",
+        f"{member} stared at the Sun for too long",
+        f"{ctx.author} was stabbed in the chest, but took it out and killed {member}",
+        f"{member} thinks about suicide, however, they call 800-273-8255 and get help from a professional",
+        f"{member} was slaughtered by hungry puppies in a bucket.",
+        f"{member} listened to death metal at max volume",
+        f"{member} was assassinated while on a date with {ctx.author}",
+        f"{member} tried to defuse a bomb. It wasn't the red wire",
+        f"{member} challenged Goku to a duel",
+        f"{member} was Haydened",
+        f"{ctx.author} figured out what the liquefy tool in Photoshop was. {member} was their first test subject",
+        f"{ctx.author} used {member} as a shield in a gunfight",
+        f"{member} went on https://reddit.com/r/rule34fallguys"
+    ]
+    await ctx.send(statements[random.randint(0, len(statements)-1)])
 
 
 @bot.command()
@@ -2517,7 +2470,3 @@ async def weather(ctx):
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
-t)
-t)
-t)
-t)
