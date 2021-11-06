@@ -824,7 +824,7 @@ async def rob(ctx, member: discord.Member):
 
 @bot.command()
 async def fight(ctx, member: discord.Member):
-    statements = [f"{ctx.author} beat {member} into pulp", 
+    statements = [f"{ctx.author} beat {member} into pulp",
                   f"{ctx.author} used Self Destruct! It was not very effective...",
                   f"{ctx.author} was too much for {member}",
                   f"{member} was ended by {ctx.author}",
@@ -1331,13 +1331,13 @@ async def schedule(ctx, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
         if user_id == list_classes[i][0]:
             list_classes[i][1:] = [arg1, arg2, arg3, arg4, arg5, arg6, arg7]
             worksheet3.update(f'A1:H{len(list_classes)}', list_classes)
-            await ctx.send(f"{user.name} schedule has been updated")
+            await ctx.send(f"{ctx.author.name} schedule has been updated")
             ifFound = True
     if ifFound == False:
         list_classes.append(
             [user_id, arg1, arg2, arg3, arg4, arg5, arg6, arg7])
         worksheet3.update(f'A1:H{len(list_classes)}', list_classes)
-        await ctx.send(f"{user.name}'s schedule has been set")
+        await ctx.send(f"{ctx.author.name}'s schedule has been set")
 
 
 @bot.command()
