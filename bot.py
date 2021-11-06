@@ -182,12 +182,42 @@ status = cycle([
 @bot.event
 async def on_ready():
     change_status.start()
+    get_covid_data.start()
     print("The NSBORO Bot is up and running.")
 
 
 @tasks.loop(seconds=10)
 async def change_status():
     await bot.change_presence(activity=discord.Game(next(status)))
+
+@tasks.loop(seconds=21600)
+async def get_covid_data():
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(
+        "https://www.nsboro.k12.ma.us/site/default.aspx?PageType=3&DomainID=4&ModuleInstanceID=438&ViewID=6446EE88-D30C-497E-9316-3F8874B3E108&RenderLoc=0&FlexDataID=6091&PageID=1&Comments=true"
+    )
+    driver.maximize_window()
+
+    button = driver.find_element_by_link_text(
+        "NSBORO Weekly COVID-19 Dashboard")
+    print(button)
+    button.click()
+
+    p = driver.current_window_handle
+
+    chwd = driver.window_handles
+
+    for w in chwd:
+        if (w != p):
+            driver.switch_to.window(w)
+
+    driver.set_window_size(1920, 2000)
+
+    a = ActionChains(driver)
+    a.key_down(Keys.CONTROL).key_down(Keys.ALT).send_keys('[').key_up(
+        Keys.CONTROL).key_up(Keys.ALT).perform()
+
+    driver.save_screenshot("ss.png")
 
 
 @bot.event
@@ -1390,37 +1420,6 @@ async def announce(ctx, *, arg):
 
 @bot.command()
 async def covid(ctx):
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.get(
-        "https://www.nsboro.k12.ma.us/site/default.aspx?PageType=3&DomainID=4&ModuleInstanceID=438&ViewID=6446EE88-D30C-497E-9316-3F8874B3E108&RenderLoc=0&FlexDataID=6091&PageID=1&Comments=true"
-    )
-    driver.maximize_window()
-
-    button = driver.find_element_by_link_text(
-        "NSBORO Weekly COVID-19 Dashboard")
-    print(button)
-    button.click()
-
-    # get current window handle
-    p = driver.current_window_handle
-
-    # get first child window
-    chwd = driver.window_handles
-
-    for w in chwd:
-        if (w != p):
-            driver.switch_to.window(w)
-
-    driver.set_window_size(1920, 2000)
-
-    # ctrl + alt + [
-    a = ActionChains(driver)
-    a.key_down(Keys.CONTROL).key_down(Keys.ALT).send_keys('[').key_up(
-        Keys.CONTROL).key_up(Keys.ALT).perform()
-
-    driver.save_screenshot("ss.png")
-    screenshot = Image.open("ss.png")
-
     await ctx.send(file=discord.File(".//ss.png"))
 
 
@@ -2273,7 +2272,7 @@ async def shop(ctx):
     em = discord.Embed(
         title="Shop",
         description=
-        "It will open the NSBORO bot shop where you can buy micellaneous items with your coins"
+        "It will open the NSBORO bot shop where you can buy miscellaneous items with your coins"
     )
     em.add_field(name="**Syntax**", value=".shop")
     await ctx.send(embed=em)
@@ -2283,7 +2282,7 @@ async def shop(ctx):
 async def bag(ctx):
     em = discord.Embed(
         title="Bag",
-        description="It will open your inventory containig items you bought")
+        description="It will open your inventory containing items you bought")
     em.add_field(name="**Syntax**", value=".bag")
     await ctx.send(embed=em)
 
@@ -2293,7 +2292,7 @@ async def buy(ctx):
     em = discord.Embed(
         title="Buy",
         description=
-        "Buys [qty] [item]s from the Shop with your coins. Leaving [qty] blank will default the amount to one"
+        "Buys [qty] [item]s from the shop with your coins. Leaving [qty] blank will default the amount to one"
     )
     em.add_field(name="**Syntax**", value=".buy [item] [qty]")
     await ctx.send(embed=em)
@@ -2463,7 +2462,7 @@ async def therapy(ctx):
 
 @help.command()
 async def weather(ctx):
-    em = discord.Embed(title="Weather", description="Sends the weathe")
+    em = discord.Embed(title="Weather", description="Sends the weather")
     em.add_field(name="**Syntax**",
                  value=".weather [place]")
     await ctx.send(embed=em)
