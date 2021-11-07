@@ -23,6 +23,7 @@ from googletrans import Translator, constants
 import python_weather
 from instagram_web_api import Client, ClientCompatPatch, ClientError, ClientLoginError
 import instaloader
+from GoogleNews import GoogleNews
 
 os.system('pip install googletrans==3.1.0a0')
 
@@ -154,26 +155,17 @@ periods = [
     "period 7"
 ]
 
-status = cycle([
-    'osu!', 'Genshin Impact!', 'Should I become therapy bot',
-    'when will i get an update'
-])
-
-
 @bot.event
 async def on_ready():
-    change_status.start()
+    await bot.change_presence(activity=discord.Game(".help"))
+    getNews.start()
     get_covid_data.start()
     getInstagram.start()
     print("The NSBORO Bot is up and running.")
+    
 
 
-@tasks.loop(seconds=10)
-async def change_status():
-    await bot.change_presence(activity=discord.Game(next(status)))
-
-
-@tasks.loop(seconds=21600)
+@tasks.loop(seconds=21000)
 async def get_covid_data():
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(
@@ -241,7 +233,7 @@ async def getInstagram():
     text_files = [k for k in os.listdir(path) if k.endswith('.jpg')]
     for thing in text_files:
         await channel.send(file=discord.File(f".//gonkgram//{thing}"))
-    
+
     # gonk2024
     profile = instaloader.Profile.from_username(L.context, 'gonk2024')
     for post in profile.get_posts():
@@ -272,6 +264,28 @@ async def getInstagram():
     text_files = [k for k in os.listdir(path) if k.endswith('.jpg')]
     for thing in text_files:
         await channel.send(file=discord.File(f".//gonk2024//{thing}"))
+
+@tasks.loop(hours=24)
+async def getNews():
+    channel = bot.get_channel(906915291668299786)
+    topics = ['news', 'Massachusetts', "COVID-19"]
+    for i in topics:
+        googlenews = GoogleNews(lang='en', region='US', period="1d")
+        if i == 'news':
+            title = 'Miscellaneous'
+        else:
+            title = i
+        googlenews.search(i)
+        titles = googlenews.get_texts()
+        links = googlenews.get_links()
+        em = discord.Embed(
+            title=f"{title} News",
+            description=f"```Recent news about {title}```",
+            color=discord.Color.blue())
+        for j in range(5):
+            em.add_field(name=titles[j], value=links[j])
+        await channel.send(embed=em)
+
 
 @bot.event
 async def on_member_join(member):
@@ -2077,6 +2091,26 @@ async def weather(ctx, *, args):
     for forecast in weather.forecasts:
         em.add_field(name=str(forecast.date)[0:10], value=f"{str(forecast.sky_text)}: {str(forecast.temperature)}° F")
     await client.close()
+    await ctx.send(embed=em)
+
+
+@bot.command()
+async def news(ctx, *, topic=""):
+    title = topic
+    if topic == "":
+        topic = "news"
+        title = "Miscellaneous"
+    googlenews = GoogleNews()
+    googlenews = GoogleNews(lang='en', region='US', period="7d")
+    googlenews.search(topic)
+    titles = googlenews.get_texts()
+    links = googlenews.get_links()
+    em = discord.Embed(
+        title=f"{title} News",
+        description=f"```Recent news about {title}```",
+        color=discord.Color.blue())
+    for i in range(5):
+        em.add_field(name=titles[i], value=links[i])
     await ctx.send(embed=em)
 
 
