@@ -21,6 +21,9 @@ import urllib.parse
 import urllib.request
 from googletrans import Translator, constants
 import python_weather
+from instagram_web_api import Client, ClientCompatPatch, ClientError, ClientLoginError
+import instaloader
+
 
 os.system('pip install googletrans==3.1.0a0')
 
@@ -162,9 +165,9 @@ status = cycle([
 @bot.event
 async def on_ready():
     change_status.start()
-    get_covid_data.start()
+    # get_covid_data.start()
+    getInstagram.start()
     print("The NSBORO Bot is up and running.")
-
 
 @tasks.loop(seconds=10)
 async def change_status():
@@ -199,6 +202,39 @@ async def get_covid_data():
 
     driver.save_screenshot("ss.png")
 
+@tasks.loop(seconds=21600)
+async def getInstagram():
+    username = os.environ['username']
+    password = os.environ['password']
+
+    L = instaloader.Instaloader()
+    L.login(username, password)
+    profile = instaloader.Profile.from_username(L.context, 'gonkgram')
+    for post in profile.get_posts():
+        f = open('old_post.txt', 'r')
+        old_file_name = f.readline()
+        filename = L.format_filename(post, target=profile.username)
+        if filename.strip() == old_file_name.strip():
+            return
+        else:
+            dir = './/gonkgram//'
+            for f in os.listdir(dir):
+                os.remove(os.path.join(dir, f))
+            L.download_post(post, target=profile.username)
+            image_file = filename + '.jpg'
+            caption_file = filename + '.txt'
+            break
+    f = open(f".//gonkgram//{caption_file}")
+    captions = f.readlines()
+    caption = ""
+    for cap in captions:
+        caption += cap
+    file = open("old_post.txt", "w")
+    file.close()
+    f = open('old_post.txt', 'w')
+    f.write(filename.strip())
+    channel = bot.get_channel(685979175697383554)
+    await channel.send(caption, file=discord.File(f".//gonkgram//{image_file}"))
 
 @bot.event
 async def on_member_join(member):
