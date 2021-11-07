@@ -163,7 +163,7 @@ status = cycle([
 @bot.event
 async def on_ready():
     change_status.start()
-    # get_covid_data.start()
+    get_covid_data.start()
     getInstagram.start()
     print("The NSBORO Bot is up and running.")
 
