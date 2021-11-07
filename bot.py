@@ -24,7 +24,6 @@ import python_weather
 from instagram_web_api import Client, ClientCompatPatch, ClientError, ClientLoginError
 import instaloader
 
-
 os.system('pip install googletrans==3.1.0a0')
 
 chrome_options = Options()
@@ -155,7 +154,6 @@ periods = [
     "period 7"
 ]
 
-
 status = cycle([
     'osu!', 'Genshin Impact!', 'Should I become therapy bot',
     'when will i get an update'
@@ -169,9 +167,11 @@ async def on_ready():
     getInstagram.start()
     print("The NSBORO Bot is up and running.")
 
+
 @tasks.loop(seconds=10)
 async def change_status():
     await bot.change_presence(activity=discord.Game(next(status)))
+
 
 @tasks.loop(seconds=21600)
 async def get_covid_data():
@@ -202,6 +202,7 @@ async def get_covid_data():
 
     driver.save_screenshot("ss.png")
 
+
 @tasks.loop(seconds=21600)
 async def getInstagram():
     username = os.environ['username']
@@ -209,9 +210,11 @@ async def getInstagram():
 
     L = instaloader.Instaloader()
     L.login(username, password)
+
+    # gonkgram
     profile = instaloader.Profile.from_username(L.context, 'gonkgram')
     for post in profile.get_posts():
-        f = open('old_post.txt', 'r')
+        f = open('gonkgram_oldpost.txt', 'r')
         old_file_name = f.readline()
         filename = L.format_filename(post, target=profile.username)
         if filename.strip() == old_file_name.strip():
@@ -221,7 +224,6 @@ async def getInstagram():
             for f in os.listdir(dir):
                 os.remove(os.path.join(dir, f))
             L.download_post(post, target=profile.username)
-            image_file = filename + '.jpg'
             caption_file = filename + '.txt'
             break
     f = open(f".//gonkgram//{caption_file}")
@@ -229,12 +231,47 @@ async def getInstagram():
     caption = ""
     for cap in captions:
         caption += cap
-    file = open("old_post.txt", "w")
+    file = open("gonkgram_oldpost.txt", "w")
     file.close()
-    f = open('old_post.txt', 'w')
+    f = open('gonkgram_oldpost.txt', 'w')
     f.write(filename.strip())
-    channel = bot.get_channel(685979175697383554)
-    await channel.send(caption, file=discord.File(f".//gonkgram//{image_file}"))
+    channel = bot.get_channel(685975002683539569)
+    await channel.send(caption)
+    path = ".//gonkgram//"
+    text_files = [k for k in os.listdir(path) if k.endswith('.jpg')]
+    for thing in text_files:
+        await channel.send(file=discord.File(f".//gonkgram//{thing}"))
+    
+    # gonk2024
+    profile = instaloader.Profile.from_username(L.context, 'gonk2024')
+    for post in profile.get_posts():
+        f = open('gonk2024_oldpost.txt', 'r')
+        old_file_name = f.readline()
+        filename = L.format_filename(post, target=profile.username)
+        if filename.strip() == old_file_name.strip():
+            return
+        else:
+            dir = './/gonk2024//'
+            for f in os.listdir(dir):
+                os.remove(os.path.join(dir, f))
+            L.download_post(post, target=profile.username)
+            caption_file = filename + '.txt'
+            break
+    f = open(f".//gonk2024//{caption_file}")
+    captions = f.readlines()
+    caption = ""
+    for cap in captions:
+        caption += cap
+    file = open("gonk2024_oldpost.txt", "w")
+    file.close()
+    f = open('gonk2024_oldpost.txt', 'w')
+    f.write(filename.strip())
+    channel = bot.get_channel(685975002683539569)
+    await channel.send(caption)
+    path = ".//gonk2024//"
+    text_files = [k for k in os.listdir(path) if k.endswith('.jpg')]
+    for thing in text_files:
+        await channel.send(file=discord.File(f".//gonk2024//{thing}"))
 
 @bot.event
 async def on_member_join(member):
@@ -604,10 +641,18 @@ async def namelist(ctx):
         title="Name List",
         description="```List of IRL Names for students on the NSBORO Server.```",
         color=discord.Color.orange())
-    em2 = discord.Embed(title="Name List Part 2", description="```Part 2 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
-    em3 = discord.Embed(title="Name List Part 3", description="```Part 3 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
-    em4 = discord.Embed(title="Name List Part 4", description="```Part 4 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
-    em5 = discord.Embed(title="Name List Part 5", description="```Part 5 of list of IRL Names for students on the NSBORO Server.```", color=discord.Color.orange())
+    em2 = discord.Embed(title="Name List Part 2",
+                        description="```Part 2 of list of IRL Names for students on the NSBORO Server.```",
+                        color=discord.Color.orange())
+    em3 = discord.Embed(title="Name List Part 3",
+                        description="```Part 3 of list of IRL Names for students on the NSBORO Server.```",
+                        color=discord.Color.orange())
+    em4 = discord.Embed(title="Name List Part 4",
+                        description="```Part 4 of list of IRL Names for students on the NSBORO Server.```",
+                        color=discord.Color.orange())
+    em5 = discord.Embed(title="Name List Part 5",
+                        description="```Part 5 of list of IRL Names for students on the NSBORO Server.```",
+                        color=discord.Color.orange())
 
     counter = 1
     for x in list_names:
@@ -923,7 +968,7 @@ async def kill(ctx, member: discord.Member):
         f"{ctx.author} used {member} as a shield in a gunfight",
         f"{member} went on https://reddit.com/r/rule34fallguys"
     ]
-    await ctx.send(statements[random.randint(0, len(statements)-1)])
+    await ctx.send(statements[random.randint(0, len(statements) - 1)])
 
 
 @bot.command()
@@ -1716,6 +1761,7 @@ async def remove(ctx, arg):
     if found == False:
         await ctx.send(f"You do not have any homework!")
 
+
 @hw.command()
 async def change(ctx, arg1, *, arg2):
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -1738,6 +1784,7 @@ async def change(ctx, arg1, *, arg2):
             worksheet4.update(f'A1:{alphabet[len(list_hw[0]) - 1].upper()}{len(list_hw)}', list_hw)
     if found == False:
         await ctx.send(f"You do not have any homework!")
+
 
 @hw.command()
 async def clear(ctx):
@@ -1921,7 +1968,8 @@ async def codes(ctx):
     await ctx.send(embed=em3)
     await ctx.send(embed=em4)
 
-@bot.group(invoke_without_command = True)
+
+@bot.group(invoke_without_command=True)
 async def therapy(ctx):
     em = discord.Embed(
         title=f"Mental Health Commands",
@@ -1934,6 +1982,7 @@ async def therapy(ctx):
     em.add_field(name="`.therapy vent`", value="Vent in dms! Everything will be kept private.")
 
     await ctx.send(embed=em)
+
 
 @therapy.command()
 async def breathe(ctx):
@@ -1955,6 +2004,7 @@ async def breathe(ctx):
     em.set_footer(text="Everything will be okay <3")
 
     await ctx.send(embed=em)
+
 
 @therapy.command()
 async def hotlines(ctx):
@@ -1982,6 +2032,7 @@ async def motivation(ctx):
         color=discord.Color.blue())
     await ctx.send(embed=em)
 
+
 @therapy.command()
 async def relax(ctx):
     links = ["https://thumbs.gfycat.com/ObedientEmptyGazelle-max-1mb.gif",
@@ -1996,7 +2047,8 @@ async def relax(ctx):
              "https://i.pinimg.com/originals/34/d7/a3/34d7a3bbe7ab056f213e66c7182dd57e.gif",
              "https://64.media.tumblr.com/29a8712aafa887fe4c8d32b726adb647/tumblr_osiz5xMRBW1vg9wr5o1_1280.gif",
              "https://i.imgur.com/UmppnUD.gif"]
-    motivations = ["it'll be alright <3", "everything will be okay <3", "take a deep breath and relax <3", "you have nothing to worry about <3"]
+    motivations = ["it'll be alright <3", "everything will be okay <3", "take a deep breath and relax <3",
+                   "you have nothing to worry about <3"]
 
     em = discord.Embed(
         title=motivations[random.randrange(0, len(motivations))],
@@ -2005,12 +2057,14 @@ async def relax(ctx):
     em.set_image(url=links[random.randrange(0, len(links))])
     await ctx.send(embed=em)
 
+
 @therapy.command()
 async def vent(ctx):
     person = bot.get_user(ctx.author.id)
     await person.send("Vent here, no one is listening!")
 
-@bot.group(invoke_without_command = True)
+
+@bot.group(invoke_without_command=True)
 async def weather(ctx, *, args):
     client = python_weather.Client(format=python_weather.IMPERIAL)
     weather = await client.find(args)
@@ -2018,11 +2072,13 @@ async def weather(ctx, *, args):
         title=f"Weather of {args}",
         description=f"```As of {date.today()}```",
         color=discord.Color.blue())
-    em.add_field(name="Temperature", value=str(weather.current.sky_text) + ": " + str(weather.current.temperature)+ "° F")
+    em.add_field(name="Temperature",
+                 value=str(weather.current.sky_text) + ": " + str(weather.current.temperature) + "° F")
     for forecast in weather.forecasts:
         em.add_field(name=str(forecast.date)[0:10], value=f"{str(forecast.sky_text)}: {str(forecast.temperature)}° F")
     await client.close()
     await ctx.send(embed=em)
+
 
 @bot.group(invoke_without_command=True)
 async def help(ctx):
@@ -2531,6 +2587,7 @@ async def translate(ctx):
     em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
+
 @help.command()
 async def therapy(ctx):
     em = discord.Embed(title="Therapy", description="```Personal therapy for irene```")
@@ -2539,6 +2596,7 @@ async def therapy(ctx):
     em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
+
 @help.command()
 async def weather(ctx):
     em = discord.Embed(title="Weather", description="```Sends the weather```")
@@ -2546,6 +2604,7 @@ async def weather(ctx):
                  value=".weather [place]")
     em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
+
 
 my_secret = os.environ['serverkey']
 bot.run(my_secret)
