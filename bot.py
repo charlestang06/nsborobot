@@ -24,6 +24,8 @@ import python_weather
 from instagram_web_api import Client, ClientCompatPatch, ClientError, ClientLoginError
 import instaloader
 from GoogleNews import GoogleNews
+from PyDictionary import PyDictionary
+from pytrivia import Category, Diffculty, Type, Trivia
 
 os.system('pip install googletrans==3.1.0a0')
 
@@ -155,6 +157,7 @@ periods = [
     "period 7"
 ]
 
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Game(".help"))
@@ -162,10 +165,9 @@ async def on_ready():
     get_covid_data.start()
     getInstagram.start()
     print("The NSBORO Bot is up and running.")
-    
 
 
-@tasks.loop(seconds=21000)
+@tasks.loop(hours=23)
 async def get_covid_data():
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(
@@ -195,7 +197,7 @@ async def get_covid_data():
     driver.save_screenshot("ss.png")
 
 
-@tasks.loop(seconds=21600)
+@tasks.loop(hours=15)
 async def getInstagram():
     username = os.environ['username']
     password = os.environ['password']
@@ -209,7 +211,8 @@ async def getInstagram():
         f = open('gonkgram_oldpost.txt', 'r')
         old_file_name = f.readline()
         filename = L.format_filename(post, target=profile.username)
-        if filename.strip() == old_file_name.strip():
+        if old_file_name.strip() in filename or old_file_name == filename or filename in old_file_name:
+            print("nothing new on gonkgram")
             return
         else:
             dir = './/gonkgram//'
@@ -240,7 +243,8 @@ async def getInstagram():
         f = open('gonk2024_oldpost.txt', 'r')
         old_file_name = f.readline()
         filename = L.format_filename(post, target=profile.username)
-        if filename.strip() == old_file_name.strip():
+        if old_file_name.strip() in filename or old_file_name == filename or filename in old_file_name:
+            print("nothing new on gonk2024")
             return
         else:
             dir = './/gonk2024//'
@@ -264,6 +268,7 @@ async def getInstagram():
     text_files = [k for k in os.listdir(path) if k.endswith('.jpg')]
     for thing in text_files:
         await channel.send(file=discord.File(f".//gonk2024//{thing}"))
+
 
 @tasks.loop(hours=24)
 async def getNews():
@@ -2113,6 +2118,46 @@ async def news(ctx, *, topic=""):
         em.add_field(name=titles[i], value=links[i])
     await ctx.send(embed=em)
 
+@bot.command()
+async def trivia(ctx):
+    my_api = Trivia(True)
+    response = my_api.request(1, None, None, Type.Multiple_Choice)
+
+    all_answers = [response['results'][0]['correct_answer']] + response['results'][0]['incorrect_answers']
+    random.shuffle(all_answers)
+    correct_answer = response['results'][0]['correct_answer']
+    val_str = ""
+    for i in range(len(all_answers)):
+        val_str += f"{i + 1}. {all_answers[i]} \n"
+    em = discord.Embed(
+        title=response['results'][0]['question'],
+        description=f"Category: {response['results'][0]['category']}, " + f"Difficulty: {response['results'][0]['difficulty'].capitalize()} \n \n {val_str}",
+        color=discord.Color.blue())
+    em.set_footer(text="Say the number of the correct answer")
+
+    await ctx.send(embed=em)
+    msg = await bot.wait_for('message', check=lambda message: message.author == ctx.author)
+    possibles = [str(i) for i in range(1, 5)]
+    if msg.content not in possibles:
+        await ctx.send("Input a valid number!")
+    elif all_answers[int(msg.content) - 1] == correct_answer:
+        await ctx.send(":white_check_mark: You were right!")
+    else:
+        await ctx.send(f":x: Incorrect! The correct answer was **{correct_answer}**")
+
+@bot.command()
+async def definition(ctx, arg):
+    dictionary = PyDictionary()
+    result = "```"
+    for key in dictionary.meaning(arg).keys():
+        result += key + ": \n"
+        counter = 1
+        for definition_ in dictionary.meaning(arg)[key]:
+            result += f"{counter}. {definition_} \n"
+            counter += 1
+    result += "```"
+    await ctx.send(result)
+
 
 @bot.group(invoke_without_command=True)
 async def help(ctx):
@@ -2636,6 +2681,21 @@ async def weather(ctx):
     em = discord.Embed(title="Weather", description="```Sends the weather```")
     em.add_field(name="**Syntax**",
                  value=".weather [place]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
+    await ctx.send(embed=em)
+
+
+@help.command()
+async def definition(ctx):
+    em = discord.Embed(title="Definition", description="```Sends the definition of a word```")
+    em.add_field(name="**Syntax**", value=".definition [word]")
+    em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
+    await ctx.send(embed=em)
+
+@help.command()
+async def trivia(ctx):
+    em = discord.Embed(title="Trivia", description="```Sends a random trivia question!```")
+    em.add_field(name="**Syntax**", value=".trivia")
     em.set_thumbnail(url="https://i.imgur.com/VfNZlg1.jpg")
     await ctx.send(embed=em)
 
