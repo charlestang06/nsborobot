@@ -1553,7 +1553,7 @@ async def getclass(ctx, user: discord.Member = None):
         if currentDay in [5, 6]:
             await ctx.send("Today is a weekend")
             return
-        hour = int(now.strftime("%H")) - 4
+        hour = int(now.strftime("%H")) - 4 - 1
         if hour < 0:
             hour = 24 - hour
         currentMin = hour * 60 + int(now.strftime("%M"))
@@ -1605,7 +1605,7 @@ async def next(ctx, user: discord.Member = None):
         if currentDay in [5, 6]:
             await ctx.send("Today is a weekend")
             return
-        hour = int(now.strftime("%H")) - 4
+        hour = int(now.strftime("%H")) - 4 - 1
         if hour < 0:
             hour = 24 - hour
         currentMin = hour * 60 + int(now.strftime("%M"))
@@ -1643,7 +1643,7 @@ async def period(ctx):
     if currentDay in [5, 6]:
         await ctx.send("Today is a weekend")
         return
-    hour = int(now.strftime("%H")) - 4
+    hour = int(now.strftime("%H")) - 4 - 1
     if hour < 0:
         hour = 24 - hour
     currentMin = hour * 60 + int(now.strftime("%M"))
@@ -1678,7 +1678,7 @@ async def next(ctx):
     if currentDay in [5, 6]:
         await ctx.send("Today is a weekend")
         return
-    hour = int(now.strftime("%H")) - 4
+    hour = int(now.strftime("%H")) - 4 - 1
     if hour < 0:
         hour = 24 - hour
     currentMin = hour * 60 + int(now.strftime("%M"))
